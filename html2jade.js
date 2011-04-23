@@ -34,7 +34,9 @@
         result += '#' + node.id;
       }
       if (node.hasAttribute('class')) {
-        classes = node.getAttribute('class').split(/\s+/);
+        classes = node.getAttribute('class').split(/\s+/).filter(function(item) {
+          return (item != null) && item.trim().length > 0;
+        });
         result += '.' + classes.join('.');
       }
       if (result.length === 0) {

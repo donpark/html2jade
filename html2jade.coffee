@@ -23,7 +23,8 @@ class Helper
         if node.id
             result += '#' + node.id
         if node.hasAttribute('class')
-            classes = node.getAttribute('class').split(/\s+/)
+            classes = node.getAttribute('class').split(/\s+/).filter (item) ->
+                item? and item.trim().length > 0
             result += '.' + classes.join('.')
         result = 'div' if result.length is 0
         result
