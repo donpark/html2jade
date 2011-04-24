@@ -112,12 +112,44 @@ class Helper
         else
             []
 
+
+publicIdDocTypeNames =
+    "-//W3C//DTD XHTML 1.0 Transitional//EN":   "transitional"
+    "-//W3C//DTD XHTML 1.0 Strict//EN":         "strict"
+    "-//W3C//DTD XHTML 1.0 Frameset//EN":       "frameset"
+    "-//W3C//DTD XHTML 1.1//EN":                "1.1"
+    "-//W3C//DTD XHTML Basic 1.1//EN":          "basic"
+    "-//WAPFORUM//DTD XHTML Mobile 1.2//EN":    "mobile"
+    
+systemIdDocTypeNames =
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd":          "transitional"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd":                "strict"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd":              "frameset"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd":                     "1.1"
+    "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd":               "basic"
+    "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd":    "mobile"
+    
+        
 class Converter
     constructor: (@options) ->
         @options ?= {}
         @helper = @options.helper ?= new Helper()
         
     document: (document, output) ->
+        if document.doctype?
+            doctype = document.doctype
+            docTypeName = undefined
+            publicId = doctype.publicId
+            systemId = doctype.systemId
+            if publicId? and publicIdDocTypeNames[publicId]?
+                docTypeName = publicIdDocTypeNames[publicId]
+            else if systemId? and systemIdDocTypeNames[systemId]?
+                docTypeName = systemIdDocTypeNames[systemId]?
+            else if doctype.name? and doctype.name.toLowerCase() is 'html'
+                docTypeName = '5'
+            if docTypeName?
+                output.writeln '!!! ' + docTypeName
+
         this.element document.documentElement, output
 
     element: (node, output) ->

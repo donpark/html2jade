@@ -1,5 +1,5 @@
 (function() {
-  var Converter, Helper, Output, Parser;
+  var Converter, Helper, Output, Parser, publicIdDocTypeNames, systemIdDocTypeNames;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Parser = (function() {
     function Parser() {
@@ -186,6 +186,22 @@
     };
     return Helper;
   })();
+  publicIdDocTypeNames = {
+    "-//W3C//DTD XHTML 1.0 Transitional//EN": "transitional",
+    "-//W3C//DTD XHTML 1.0 Strict//EN": "strict",
+    "-//W3C//DTD XHTML 1.0 Frameset//EN": "frameset",
+    "-//W3C//DTD XHTML 1.1//EN": "1.1",
+    "-//W3C//DTD XHTML Basic 1.1//EN": "basic",
+    "-//WAPFORUM//DTD XHTML Mobile 1.2//EN": "mobile"
+  };
+  systemIdDocTypeNames = {
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd": "transitional",
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd": "strict",
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd": "frameset",
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd": "1.1",
+    "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd": "basic",
+    "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd": "mobile"
+  };
   Converter = (function() {
     function Converter(options) {
       var _base, _ref, _ref2;
@@ -194,6 +210,23 @@
       this.helper = (_ref2 = (_base = this.options).helper) != null ? _ref2 : _base.helper = new Helper();
     }
     Converter.prototype.document = function(document, output) {
+      var docTypeName, doctype, publicId, systemId;
+      if (document.doctype != null) {
+        doctype = document.doctype;
+        docTypeName = void 0;
+        publicId = doctype.publicId;
+        systemId = doctype.systemId;
+        if ((publicId != null) && (publicIdDocTypeNames[publicId] != null)) {
+          docTypeName = publicIdDocTypeNames[publicId];
+        } else if ((systemId != null) && (systemIdDocTypeNames[systemId] != null)) {
+          docTypeName = systemIdDocTypeNames[systemId] != null;
+        } else if ((doctype.name != null) && doctype.name.toLowerCase() === 'html') {
+          docTypeName = '5';
+        }
+        if (docTypeName != null) {
+          output.writeln('!!! ' + docTypeName);
+        }
+      }
       return this.element(document.documentElement, output);
     };
     Converter.prototype.element = function(node, output) {
