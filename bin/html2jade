@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var url = require('url');
+
+var Log = require('log');
+var log = new Log(Log.INFO);
+
+var optimist = require('optimist');
+
+try {
+    jade = require('../lib/jade');
+} catch(err) {
+    jade = require('jade');
+}
+
+
+var html2jade;
+try {
+    html2jade = require('html2jade');
+} catch(err) {
+    html2jade = require('../lib/html2jade');
+}
+
+var argv = require('optimist').argv;
+argv._.forEach(function(arg) {
+    if (arg) {
+        try {
+            url.parse(arg);
+        } catch(err) {
+            if (arg[0] === '~') {
+                arg = path.join(process.env['HOME'], arg);
+            } else if (parg[0] !== '/') {
+                arg = path.join(process.cwd(), arg);
+            }
+        }
+        if (arg) {
+            var errors = html2jade.convert(arg);
+            if (errors && errors.length > 0) {
+                log.error(errors);
+            }
+        } else {
+            log.error('invalid input: ' + arg);
+        }
+    }
+});
