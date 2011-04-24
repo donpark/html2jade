@@ -16,5 +16,4 @@
 
 ## Status ##
 
-Very raw, spent-only-a-few-hours raw. But I'm going to be using this for work so you can expect improvements as I discover problems while using. Pull requests are welcome.
-
+Usable but sometimes requires fixing up, usually involving conditionals and PRE.
