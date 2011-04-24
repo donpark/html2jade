@@ -8,7 +8,11 @@
 
 ## Usage ##
 
-    html2jade {url or path}
+    html2jade http://twitter.com
+    
+    html2jade http://twitter.com > twitter.jade
+    
+    html2jade mywebpage.html > mywebpage.jade
 
 ## Status ##
 
