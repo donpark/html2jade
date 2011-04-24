@@ -21,4 +21,6 @@ Outputs to file if input is file
 
 ## Status ##
 
-Usable but sometimes requires fixing up, usually involving conditionals and PRE.
+Mostly usable but sometimes requires fixing up, usually involving conditionals and scripts indentation.
+
+While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
