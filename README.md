@@ -8,11 +8,16 @@
 
 ## Usage ##
 
+Outputs to stdout if input is URL
+
     html2jade http://twitter.com
     
     html2jade http://twitter.com > twitter.jade
     
-    html2jade mywebpage.html > mywebpage.jade
+Outputs to file if input is file
+    
+    html2jade mywebpage.html # outputs mywebpage.jade
+    html2jade public/*.html  # converts all .html files to .jade
 
 ## Status ##
 

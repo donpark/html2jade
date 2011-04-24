@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
+var fs = require('fs');
 var path = require('path');
 var url = require('url');
-
-var Log = require('log');
-var log = new Log(Log.INFO);
 
 var optimist = require('optimist');
 
@@ -22,25 +20,46 @@ try {
     html2jade = require('../lib/html2jade');
 }
 
+function convert(input, output) {
+    if (input) {
+        try {
+            var errors = html2jade.convert(input, output);
+            if (errors) {
+                console.error('parser errors: ' + errors);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    } else {
+        console.error('invalid input: ' + input);
+    }
+}
+
 var argv = require('optimist').argv;
 argv._.forEach(function(arg) {
-    if (arg) {
-        try {
-            url.parse(arg);
-        } catch(err) {
-            if (arg[0] === '~') {
-                arg = path.join(process.env['HOME'], arg);
-            } else if (parg[0] !== '/') {
-                arg = path.join(process.cwd(), arg);
-            }
+    if (!arg) {
+        // do nothing
+    } else if (url.parse(arg).protocol) {
+        // HACK: wonky URL detection
+        convert(arg);
+    } else {
+        // path or glob
+        if (arg.substring(0, 2) === '~/') {
+            arg = path.join(process.env['HOME'], arg.substring(2));
+        } else if (arg[0] !== '/') {
+            arg = path.join(process.cwd(), arg);
         }
-        if (arg) {
-            var errors = html2jade.convert(arg);
-            if (errors && errors.length > 0) {
-                log.error(errors);
+        if (path.existsSync(arg)) {
+            var stats = fs.statSync(arg);
+            if (stats.isFile()) {
+                var outpath = path.join(path.dirname(arg), path.basename(arg, path.extname(arg)) + '.jade');
+                var outstrm = fs.createWriteStream(outpath, {
+                    flags: 'w',
+                    encoding: 'utf8',
+                });
+                //console.log('converting: ' + arg);
+                convert(arg, new html2jade.Output(outstrm));
             }
-        } else {
-            log.error('invalid input: ' + arg);
         }
     }
 });

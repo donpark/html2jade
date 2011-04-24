@@ -1,6 +1,6 @@
 
 class Parser
-    constructor: ->
+    constructor: (@options = {}) ->
         @jsdom = require('jsdom')
 
     parse: (arg, cb) ->
@@ -14,8 +14,7 @@ class Parser
             cb('null file')
 
 class Helper
-    constructor: (@options) ->
-        @options ?= {}
+    constructor: (@options = {}) ->
         @options.wrapLength ?= 80
     
     tagHead: (node) ->
@@ -131,9 +130,8 @@ systemIdDocTypeNames =
     
         
 class Converter
-    constructor: (@options) ->
-        @options ?= {}
-        @helper = @options.helper ?= new Helper()
+    constructor: (@options = {}) ->
+        @helper = @options.helper ?= new Helper(@options)
         
     document: (document, output) ->
         if document.doctype?
@@ -228,15 +226,18 @@ exports.Parser = Parser
 exports.Output = Output
 exports.Converter = Converter
 exports.Helper = Helper
-exports.convert = (input, parser, converter, output) ->
-    parser ?= new Parser()
-    parser.parse input, (errors, window) ->
+
+# simple conversion
+exports.convert = (input, output, options) ->
+    options ?= {}
+    # specify parser and converter to override default instance
+    options.parser ?= new Parser(options)
+    options.parser.parse input, (errors, window) ->
         if errors?.length
             errors
         else
-            converter ?= new Converter()
             output ?= new Output(process.stdout)
-            converter.document window.document, output
+            options.converter ?= new Converter(options)
+            options.converter.document window.document, output
             null
 
-        
