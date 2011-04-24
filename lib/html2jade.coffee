@@ -128,7 +128,6 @@ systemIdDocTypeNames =
     "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd":               "basic"
     "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd":    "mobile"
     
-        
 class Converter
     constructor: (@options = {}) ->
         @helper = @options.helper ?= new Helper(@options)
@@ -151,13 +150,33 @@ class Converter
         this.element document.documentElement, output
 
     element: (node, output) ->
-        tagName = node.tagName
+        tagName = node.tagName.toLowerCase()
         tagHead = @helper.tagHead node
         tagAttr = @helper.tagAttr node
         tagText = @helper.tagText node
-        if ['SCRIPT', 'STYLE', 'PRE'].indexOf(tagName) isnt -1
+        if ['script', 'style'].indexOf(tagName) isnt -1
             output.writeln tagHead + tagAttr
             @helper.writeTextContent node, output, false, false, false
+        else if ['pre'].indexOf(tagName) isnt -1
+            # HACK: workaround jade's wonky PRE handling
+            output.writeln tagHead + tagAttr + '.'
+            output.enter()
+            firstline = true
+            @helper.forEachChild node, (child) =>
+                if child.nodeType is 3
+                    data = child.data
+                    if data? and data.length > 0
+                        if firstline
+                            # suckup starting linefeed if any
+                            if data.search(/\r\n|\r|\n/) is 0
+                                data = data.replace(/\r\n|\r|\n/, '')
+                            data = '\\n' + data
+                            firstline = false
+                        data = data.replace /\t/g, '\\t'
+                        data = data.replace /\r\n|\r|\n/g, '\n' + output.indents
+                        output.write data
+            output.writeln()
+            output.leave()
         else if tagText
             output.writeln tagHead + tagAttr + ' ' + tagText
         else
@@ -210,16 +229,20 @@ class Output
 
     enter: -> @indents += '  '
     leave: -> @indents = @indents.substring(2)
-
-    write: (data, indent = true) ->
+    
+    write: (data, indent=true) ->
         data ?= ''
-        data = @indents + data if indent
-        @stream.write data
+        if indent
+            @stream.write @indents + data
+        else
+            @stream.write data
 
-    writeln: (data, indent = true) ->
+    writeln: (data, indent=true) ->
         data ?= ''
-        data = @indents + data if indent
-        @stream.write data + '\n'
+        if indent
+            @stream.write @indents + data + '\n'
+        else
+            @stream.write data + '\n'
 
 
 exports.Parser = Parser
