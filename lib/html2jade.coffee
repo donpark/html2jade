@@ -64,17 +64,18 @@ class Helper
     
   writeTextContent: (node, output, pipe = true, trim = true, wrap = true) ->
     output.enter()
-    this.forEachChild node, (child) =>
-      this.writeText child, output, pipe, trim, wrap
+    @forEachChild node, (child) =>
+      @writeText child, output, pipe, trim, wrap
     output.leave()
 
-  writeText: (node, output, pipe = true, trim = true, wrap = true) ->
+
+  writeText: (node, output, pipe = true, trim = true, wrap = true, escapeFirstChar = false) ->
     if node.nodeType is 3
       data = node.data or ''
       if data.length > 0
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          this.writeTextLine line, output, pipe, trim, wrap
+          @writeTextLine line, output, pipe, trim, wrap
               
   writeTextLine: (line, output, pipe = true, trim = true, wrap = true) ->
     prefix = if pipe then '| ' else ''
@@ -84,12 +85,12 @@ class Helper
       if not wrap or line.length <= @options.wrapLength
         output.writeln prefix + line
       else
-        lines = this.breakLine line
+        lines = @breakLine line
         if lines.length is 1
           output.writeln prefix + line
         else
           lines.forEach (line) =>
-            this.writeTextLine line, output, pipe, trim, wrap
+            @writeTextLine line, output, pipe, trim, wrap
   
   breakLine: (line) ->
     if line and line.length > 0
@@ -147,10 +148,11 @@ class Converter
       if docTypeName?
         output.writeln '!!! ' + docTypeName
 
-    this.element document.documentElement, output
+    @element document.documentElement, output
 
   element: (node, output) ->
     return if not node?.tagName
+    console.log "tag: #{node.tagName}"
     tagName = node.tagName.toLowerCase()
     tagHead = @helper.tagHead node
     tagAttr = @helper.tagAttr node
@@ -182,7 +184,7 @@ class Converter
       output.writeln tagHead + tagAttr + ' ' + tagText
     else
       output.writeln tagHead + tagAttr
-      this.children node, output
+      @children node, output
     
     #if tagName is 'SCRIPT'
     
@@ -191,16 +193,17 @@ class Converter
     @helper.forEachChild parent, (child) =>
       nodeType = child.nodeType
       if nodeType is 1 # element
-        this.element child, output
+        @element child, output
       else if nodeType is 3 # text
-        this.text child, output
+        @text child, output
       else if nodeType is 8 # comment
-        this.comment child, output
+        @comment child, output
       else
         output.writeln '*** nodeType: ' + nodeType
     output.leave()
       
   text: (node, output) ->
+    console.log "text: #{node.data}"
     node.normalize()
     @helper.writeText node, output
   
@@ -208,7 +211,7 @@ class Converter
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
     if condition
       output.writeln '/' + condition[1]
-      this.conditional node, output
+      @conditional node, output
     else
       output.writeln '//' + node.data
       
@@ -221,7 +224,7 @@ class Converter
     output.enter()
     parser = new Parser()
     parser.parse data, (errors, window) =>
-      this.children window.document.body, output
+      @children window.document.body, output
     output.leave()
 
 class Output
