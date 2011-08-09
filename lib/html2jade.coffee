@@ -69,7 +69,7 @@ class Helper
     output.leave()
 
 
-  writeText: (node, output, pipe = true, trim = true, wrap = true, escapeFirstChar = false) ->
+  writeText: (node, output, pipe = true, trim = true, wrap = true) ->
     if node.nodeType is 3
       data = node.data or ''
       if data.length > 0
