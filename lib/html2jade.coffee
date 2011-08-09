@@ -150,6 +150,7 @@ class Converter
     this.element document.documentElement, output
 
   element: (node, output) ->
+    return if not node?.tagName
     tagName = node.tagName.toLowerCase()
     tagHead = @helper.tagHead node
     tagAttr = @helper.tagAttr node
