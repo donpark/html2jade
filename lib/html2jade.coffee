@@ -1,8 +1,8 @@
 
 class Parser
-  constructor: (@options = {}) ->
+  constructor: (options = {}) ->
     @jsdom = require('jsdom')
-
+    
   parse: (arg, cb) ->
     if arg?
       @jsdom.env arg, (errors, window) ->
@@ -14,9 +14,10 @@ class Parser
       cb('null file')
 
 class Helper
-  constructor: (@options = {}) ->
-    @options.wrapLength ?= 80
-  
+  constructor: (options = {}) ->
+    @wrapLength = options.wrapLength ? 80
+    @scalate = options.scalate ? false
+    @attrSep =if @scalate then ' ' else ', '
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id
@@ -39,10 +40,10 @@ class Helper
         if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
           result.push attr.nodeName + '=\'' + attr.nodeValue.replace(/'/g, '\\\'') + '\''
       if result.length > 0
-        '(' + result.join(', ') + ')'
+        '(' + result.join(@attrSep) + ')'
       else
         ''
-
+  
   tagText: (node) ->
     if node.firstChild?.nodeType isnt 3
       null
@@ -50,7 +51,7 @@ class Helper
       null
     else
       data = node.firstChild.data
-      if data.length > @options.wrapLength or data.match(/\r|\n/)
+      if data.length > @wrapLength or data.match(/\r|\n/)
         null
       else
         data
@@ -82,7 +83,7 @@ class Helper
     if trim
       line = if line then line.trim() else ''
     if line and line.length > 0
-      if not wrap or line.length <= @options.wrapLength
+      if not wrap or line.length <= @wrapLength
         output.writeln prefix + line
       else
         lines = @breakLine line
@@ -99,7 +100,7 @@ class Helper
       line = ''
       while words.length
         word = words.shift()
-        if line.length + word.length > @options.wrapLength
+        if line.length + word.length > @wrapLength
           lines.push line
           line = word
         else if line.length
@@ -130,8 +131,9 @@ systemIdDocTypeNames =
   "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd":  "mobile"
   
 class Converter
-  constructor: (@options = {}) ->
-    @helper = @options.helper ?= new Helper(@options)
+  constructor: (options = {}) ->
+    @scalate = options.scalate ? false
+    @helper = options.helper ? new Helper(options)
     
   document: (document, output) ->
     if document.doctype?
@@ -157,9 +159,13 @@ class Converter
     tagHead = @helper.tagHead node
     tagAttr = @helper.tagAttr node
     tagText = @helper.tagText node
-    if ['script', 'style'].indexOf(tagName) isnt -1
-      output.writeln tagHead + tagAttr
-      @helper.writeTextContent node, output, false, false, false
+    if tagName is 'script' or tagName is 'style'
+      if not @scalate or node.hasAttribute('src')
+        output.writeln tagHead + tagAttr
+        @helper.writeTextContent node, output, false, false, false
+      else
+        output.writeln if tagName is 'script' then ':javascript' else ':css'
+        @helper.writeTextContent node, output, false, false, false
     else if ['pre'].indexOf(tagName) isnt -1
       # HACK: workaround jade's wonky PRE handling
       output.writeln tagHead + tagAttr + '.'

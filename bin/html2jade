@@ -20,10 +20,10 @@ try {
     html2jade = require('../lib/html2jade');
 }
 
-function convert(input, output) {
+function convert(input, output, options) {
     if (input) {
         try {
-            var errors = html2jade.convert(input, output);
+            var errors = html2jade.convert(input, output, options);
             if (errors) {
                 console.error('parser errors: ' + errors);
             }
@@ -35,7 +35,15 @@ function convert(input, output) {
     }
 }
 
-var argv = require('optimist').argv;
+var options = {};
+var argv = require('optimist').boolean('scalate').argv;
+
+if (argv.scalate) {
+  options.scalate = true;
+}
+
+console.log(JSON.stringify(argv));
+
 argv._.forEach(function(arg) {
     if (!arg) {
         // do nothing
@@ -58,7 +66,7 @@ argv._.forEach(function(arg) {
                     encoding: 'utf8',
                 });
                 //console.log('converting: ' + arg);
-                convert(arg, new html2jade.Output(outstrm));
+                convert(arg, new html2jade.Output(outstrm), options);
             }
         }
     }
