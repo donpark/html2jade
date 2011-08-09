@@ -181,6 +181,8 @@ class Converter
       output.writeln()
       output.leave()
     else if tagText
+      if tagText.length > 0 and tagText.charAt(0) is '='
+        tagText = '\\' + tagText
       output.writeln tagHead + tagAttr + ' ' + tagText
     else
       output.writeln tagHead + tagAttr
