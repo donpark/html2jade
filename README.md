@@ -18,6 +18,13 @@ Outputs to file if input is file
     
     html2jade mywebpage.html # outputs mywebpage.jade
     html2jade public/*.html  # converts all .html files to .jade
+    
+To generate [Scalate](http://scalate.fusesource.org/) compatible output:
+
+    html2jade --scalate http://twitter.com
+    html2jade --scalate http://twitter.com > twitter.jade
+    html2jade --scalate mywebpage.html
+    html2jade --scalate public/*.html
 
 ## Status ##
 
