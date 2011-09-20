@@ -25,6 +25,21 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
     html2jade --scalate http://twitter.com > twitter.jade
     html2jade --scalate mywebpage.html
     html2jade --scalate public/*.html
+    
+To convert raw HTML into Jade:
+
+    var html2jade = require('html2jade');
+    var html = "<html><body>Hello World</body></html>";
+    html2jade.convertHtml(html, {}, function (err, jade) {
+      // do your thing
+    });
+    
+To convert DOM document into Jade (client-side):
+
+    // assumes html2jade.js file has been loaded
+    Html2Jade.convertDocument(document, {}, function (err, jade) {
+      // do your thing
+    });
 
 ## Status ##
 

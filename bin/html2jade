@@ -66,7 +66,7 @@ argv._.forEach(function(arg) {
                     encoding: 'utf8',
                 });
                 //console.log('converting: ' + arg);
-                convert(arg, new html2jade.Output(outstrm), options);
+                convert(arg, new html2jade.StreamOutput(outstrm), options);
             }
         }
     }

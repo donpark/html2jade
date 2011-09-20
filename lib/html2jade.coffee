@@ -1,3 +1,4 @@
+scope = exports ? this.Html2Jade ?= {}
 
 class Parser
   constructor: (options = {}) ->
@@ -13,7 +14,7 @@ class Parser
     else
       cb('null file')
 
-class Helper
+class Writer
   constructor: (options = {}) ->
     @wrapLength = options.wrapLength ? 80
     @scalate = options.scalate ? false
@@ -133,7 +134,7 @@ systemIdDocTypeNames =
 class Converter
   constructor: (options = {}) ->
     @scalate = options.scalate ? false
-    @helper = options.helper ? new Helper(options)
+    @writer = options.writer ? new Writer(options)
     
   document: (document, output) ->
     if document.doctype?
@@ -154,24 +155,24 @@ class Converter
 
   element: (node, output) ->
     return if not node?.tagName
-    console.log "tag: #{node.tagName}"
+    # console.log "tag: #{node.tagName}"
     tagName = node.tagName.toLowerCase()
-    tagHead = @helper.tagHead node
-    tagAttr = @helper.tagAttr node
-    tagText = @helper.tagText node
+    tagHead = @writer.tagHead node
+    tagAttr = @writer.tagAttr node
+    tagText = @writer.tagText node
     if tagName is 'script' or tagName is 'style'
       if not @scalate or node.hasAttribute('src')
         output.writeln tagHead + tagAttr
-        @helper.writeTextContent node, output, false, false, false
+        @writer.writeTextContent node, output, false, false, false
       else
         output.writeln if tagName is 'script' then ':javascript' else ':css'
-        @helper.writeTextContent node, output, false, false, false
+        @writer.writeTextContent node, output, false, false, false
     else if ['pre'].indexOf(tagName) isnt -1
       # HACK: workaround jade's wonky PRE handling
       output.writeln tagHead + tagAttr + '.'
       output.enter()
       firstline = true
-      @helper.forEachChild node, (child) =>
+      @writer.forEachChild node, (child) =>
         if child.nodeType is 3
           data = child.data
           if data? and data.length > 0
@@ -198,7 +199,7 @@ class Converter
     
   children: (parent, output) ->
     output.enter()
-    @helper.forEachChild parent, (child) =>
+    @writer.forEachChild parent, (child) =>
       nodeType = child.nodeType
       if nodeType is 1 # element
         @element child, output
@@ -211,9 +212,9 @@ class Converter
     output.leave()
       
   text: (node, output) ->
-    console.log "text: #{node.data}"
+    # console.log "text: #{node.data}"
     node.normalize()
-    @helper.writeText node, output
+    @writer.writeText node, output
   
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
@@ -234,45 +235,91 @@ class Converter
     parser.parse data, (errors, window) =>
       @children window.document.body, output
     output.leave()
-
+    
 class Output
-  constructor: (@stream) ->
+  constructor: ->
     @indents = ''
+  enter: ->
+    @indents += '  '
+  leave: ->
+    @indents = @indents.substring(2)
+  write: (data, indent=true) ->
+  writeln: (data, indent=true) ->
 
-  enter: -> @indents += '  '
-  leave: -> @indents = @indents.substring(2)
-  
+class StringOutput extends Output
+  constructor: ->
+    super
+    @fragments = []
+  write: (data, indent=true) ->
+    data ?= ''
+    if indent
+      @fragments.push @indents + data
+    else
+      @fragments.push data
+  writeln: (data, indent=true) ->
+    data ?= ''
+    if indent
+      @fragments.push @indents + data + '\n'
+    else
+      @fragments.push data + '\n'
+  final: ->
+    result = @fragments.join ''
+    @fragments = []
+    result
+    
+class StreamOutput extends Output
+  constructor: (@stream) ->
+    super
   write: (data, indent=true) ->
     data ?= ''
     if indent
       @stream.write @indents + data
     else
       @stream.write data
-
   writeln: (data, indent=true) ->
     data ?= ''
     if indent
       @stream.write @indents + data + '\n'
     else
       @stream.write data + '\n'
+  
+scope.Output = Output
+scope.StringOutput = StringOutput
+scope.Converter = Converter
+scope.Writer = Writer
 
+# node.js classes
+if exports?
+  scope.Parser = Parser
+  scope.StreamOutput = StreamOutput
+  scope.convert = (input, output, options) ->
+    options ?= {}
+    # specify parser and converter to override default instance
+    options.parser ?= new Parser(options)
+    options.parser.parse input, (errors, window) ->
+      if errors?.length
+        errors
+      else
+        options.output ?= new StreamOutput(process.stdout)
+        options.converter ?= new Converter(options)
+        options.converter.document window.document, options.output
 
-exports.Parser = Parser
-exports.Output = Output
-exports.Converter = Converter
-exports.Helper = Helper
-
-# simple conversion
-exports.convert = (input, output, options) ->
+scope.convertHtml = (html, options, cb) ->
   options ?= {}
   # specify parser and converter to override default instance
   options.parser ?= new Parser(options)
-  options.parser.parse input, (errors, window) ->
+  options.parser.parse html, (errors, window) ->
     if errors?.length
       errors
     else
-      output ?= new Output(process.stdout)
+      options.output ?= new StringOutput()
       options.converter ?= new Converter(options)
-      options.converter.document window.document, output
-      null
+      options.converter.document window.document, options.output
+      cb(null, options.output.final()) if cb?
 
+scope.convertDocument = (document, options, cb) ->
+  options ?= {}
+  options.output ?= new StringOutput()
+  options.converter ?= new Converter(options)
+  options.converter.document document, options.output
+  cb(null, options.output.final()) if cb?
