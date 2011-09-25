@@ -42,8 +42,6 @@ if (argv.scalate) {
   options.scalate = true;
 }
 
-console.log(JSON.stringify(argv));
-
 argv._.forEach(function(arg) {
     if (!arg) {
         // do nothing
