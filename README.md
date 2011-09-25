@@ -6,7 +6,7 @@
 
     npm install html2jade
 
-## Usage ##
+## Command-line Usage ##
 
 Outputs to stdout if input is URL
 
@@ -25,6 +25,8 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
     html2jade --scalate http://twitter.com > twitter.jade
     html2jade --scalate mywebpage.html
     html2jade --scalate public/*.html
+    
+## Programmatic Usage (>= 0.0.7)
     
 To convert raw HTML into Jade:
 
