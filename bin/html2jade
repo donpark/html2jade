@@ -6,13 +6,6 @@ var url = require('url');
 
 var optimist = require('optimist');
 
-try {
-    jade = require('../lib/jade');
-} catch(err) {
-    jade = require('jade');
-}
-
-
 var html2jade;
 try {
     html2jade = require('html2jade');
