@@ -1,18 +1,18 @@
 {
-    "name": "html2jade",
-    "description": "HTML to Jade conversion tool",
-    "version": "0.0.8",
-    "author": "Don Park <donpark@docuverse.com>",
-    "repository": "git://github.com/donpark/html2jade.git",
-    "main": "./lib/html2jade.js",
-    "bin": {
-        "html2jade": "./bin/html2jade"
-    },
-    "dependencies": {
-        "jsdom": ">= 0.2.0",
-        "optimist": ">= 0.1.9"
-    },
-    "engines": {
-        "node": ">= 0.4.0"
-    }
+  "name": "html2jade",
+  "description": "HTML to Jade conversion tool",
+  "version": "0.1.0",
+  "author": "Don Park <donpark@docuverse.com>",
+  "repository": "git://github.com/donpark/html2jade.git",
+  "main": "./lib/html2jade.js",
+  "bin": {
+    "html2jade": "./bin/html2jade"
+  },
+  "dependencies": {
+    "jsdom": ">= 0.2.9",
+    "commander": ">= 0.3.2"
+  },
+  "engines": {
+    "node": ">= 0.4.0"
+  }
 }

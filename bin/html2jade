@@ -4,8 +4,6 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 
-var optimist = require('optimist');
-
 var html2jade;
 try {
     html2jade = require('html2jade');
@@ -13,52 +11,85 @@ try {
     html2jade = require('../lib/html2jade');
 }
 
+function parsePath(arg) {
+  if (typeof arg !== 'string') {
+    console.error('invalid input: ' + arg);
+  } else if (arg[0] === '/') {
+    // already absolute path
+    return arg;
+  } else if (arg.length >= 2 && arg.substring(0, 2) === '~/') {
+    // home path
+    return path.join(process.env['HOME'], arg.substring(2));
+  } else {
+    // relative to current path
+    return path.join(process.cwd(), arg);
+  }
+}
+
 function convert(input, output, options) {
-    if (input) {
-        try {
-            var errors = html2jade.convert(input, output, options);
-            if (errors) {
-                console.error('parser errors: ' + errors);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    } else {
-        console.error('invalid input: ' + input);
+  if (input) {
+    try {
+      var errors = html2jade.convert(input, output, options);
+      if (errors) {
+        console.error('parser errors: ' + errors);
+      }
+    } catch (err) {
+      console.error(err);
     }
+  } else {
+    console.error('invalid input: ' + input);
+  }
 }
 
-var options = {};
-var argv = require('optimist').boolean('scalate').argv;
+var program = require('commander');
 
-if (argv.scalate) {
-  options.scalate = true;
-}
+program
+  .version('0.1.0')
+  .option('-s, --scalate', 'generate jade syntax compatible with Scalate')
+  .option('-o, --outdir <dir>', 'path to output generated jade file(s) to', parsePath)
 
-argv._.forEach(function(arg) {
-    if (!arg) {
-        // do nothing
-    } else if (url.parse(arg).protocol) {
-        // HACK: wonky URL detection
-        convert(arg);
-    } else {
+program
+  .command('*')
+  .action(function () {
+    console.log("default action invoked: " + JSON.stringify(arguments));
+    
+    var options = {
+      scalate: program.scalate ? true : false
+    };
+    console.log("options: " + JSON.stringify(options));
+    
+    // if outdir is provided, check existance (sorry no mkdir support yet)
+    if (program.outdir && !path.existsSync(program.outdir)) {
+      console.error("output directory '" + program.outdir + "' doesn't exist");
+      process.exit(1);
+    }
+    
+    // process each input
+    for (var i = 0; i < arguments.length; i++) {
+      var arg = arguments[i];
+      if (url.parse(arg).protocol) {
+        // URL input, use stdout
+        convert(arg, undefined, program);
+      } else {
         // path or glob
-        if (arg.substring(0, 2) === '~/') {
-            arg = path.join(process.env['HOME'], arg.substring(2));
-        } else if (arg[0] !== '/') {
-            arg = path.join(process.cwd(), arg);
+        inputPath = parsePath(arg);
+        if (path.existsSync(inputPath)) {
+          var inputStats = fs.statSync(inputPath);
+          if (inputStats.isFile()) {
+            var outdir = program.outdir || path.dirname(arg);
+            var outputPath = path.join(outdir, path.basename(inputPath, path.extname(inputPath)) + '.jade');
+            console.log("converting '" + arg + "' to '" + outputPath + "'");
+            var outputStream = fs.createWriteStream(outputPath, {
+              flags: 'w',
+              encoding: 'utf8',
+            });
+            convert(inputPath, new html2jade.StreamOutput(outputStream), program);
+          }
+        } else {
+          console.error("input file doesn't exist: " + arg);
         }
-        if (path.existsSync(arg)) {
-            var stats = fs.statSync(arg);
-            if (stats.isFile()) {
-                var outpath = path.join(path.dirname(arg), path.basename(arg, path.extname(arg)) + '.jade');
-                var outstrm = fs.createWriteStream(outpath, {
-                    flags: 'w',
-                    encoding: 'utf8',
-                });
-                //console.log('converting: ' + arg);
-                convert(arg, new html2jade.StreamOutput(outstrm), options);
-            }
-        }
+      }
     }
-});
+  });
+
+program.parse(process.argv);

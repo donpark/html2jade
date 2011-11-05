@@ -64,26 +64,28 @@ class Writer
         cb(child)
         child = child.nextSibling
     
-  writeTextContent: (node, output, pipe = true, trim = true, wrap = true) ->
+  writeTextContent: (node, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
     output.enter()
     @forEachChild node, (child) =>
-      @writeText child, output, pipe, trim, wrap
+      @writeText child, output, pipe, trim, wrap, escapeBackslash
     output.leave()
 
 
-  writeText: (node, output, pipe = true, trim = true, wrap = true) ->
+  writeText: (node, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
     if node.nodeType is 3
       data = node.data or ''
       if data.length > 0
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          @writeTextLine line, output, pipe, trim, wrap
+          @writeTextLine line, output, pipe, trim, wrap, escapeBackslash
               
-  writeTextLine: (line, output, pipe = true, trim = true, wrap = true) ->
+  writeTextLine: (line, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
     prefix = if pipe then '| ' else ''
     if trim
       line = if line then line.trim() else ''
     if line and line.length > 0
+      # escape backslash
+      line = line.replace("\\", "\\\\") if escapeBackslash
       if not wrap or line.length <= @wrapLength
         output.writeln prefix + line
       else
@@ -151,7 +153,14 @@ class Converter
       if docTypeName?
         output.writeln '!!! ' + docTypeName
 
-    @element document.documentElement, output
+    if document.documentElement
+      @element document.documentElement, output
+    else
+      # documentElement is missing.
+      # not sure why but this happens with jsdom when document has no body
+      # HACK: generate manually
+      htmlEls = document.getElementsByTagName 'html'
+      @element htmlEls[0], output if htmlEls.length > 0
 
   element: (node, output) ->
     return if not node?.tagName
@@ -161,12 +170,13 @@ class Converter
     tagAttr = @writer.tagAttr node
     tagText = @writer.tagText node
     if tagName is 'script' or tagName is 'style'
-      if not @scalate or node.hasAttribute('src')
+      if node.hasAttribute('src')
         output.writeln tagHead + tagAttr
         @writer.writeTextContent node, output, false, false, false
-      else
-        output.writeln if tagName is 'script' then ':javascript' else ':css'
-        @writer.writeTextContent node, output, false, false, false
+      else if tagName is 'script'
+        @script node, output, tagHead, tagAttr
+      else if tagName is 'style'
+        @style node, output, tagHead, tagAttr
     else if ['pre'].indexOf(tagName) isnt -1
       # HACK: workaround jade's wonky PRE handling
       output.writeln tagHead + tagAttr + '.'
@@ -194,9 +204,7 @@ class Converter
     else
       output.writeln tagHead + tagAttr
       @children node, output
-    
-    #if tagName is 'SCRIPT'
-    
+  
   children: (parent, output) ->
     output.enter()
     @writer.forEachChild parent, (child) =>
@@ -204,37 +212,59 @@ class Converter
       if nodeType is 1 # element
         @element child, output
       else if nodeType is 3 # text
-        @text child, output
+        if parent._nodeName is 'code'
+          @text child, output, false, true, true
+        else
+          @text child, output
       else if nodeType is 8 # comment
         @comment child, output
-      else
-        output.writeln '*** nodeType: ' + nodeType
     output.leave()
-      
-  text: (node, output) ->
+    
+  text: (node, output, pipe, trim, wrap) ->
     # console.log "text: #{node.data}"
     node.normalize()
-    @writer.writeText node, output
-  
+    @writer.writeText node, output, pipe, trim, wrap
+    
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
     if condition
-      output.writeln '/' + condition[1]
+      output.writeln '//' + condition[1]
       @conditional node, output
     else
-      output.writeln '//' + node.data
+      output.writeln '//'
+      output.enter()
+      data = node.data or ''
+      if data.length > 0
+        lines = data.split(/\r|\n/)
+        lines.forEach (line) =>
+          @writer.writeTextLine line, output, false, false, false
+      output.leave()
       
   conditional: (node, output) ->
-    #console.log('******* ' + require('util').inspect(node))
-    data = node._text #.replace(node.data, '').replace('<![endif]', '')
-    #console.log(require('util').inspect(data))
+    data = node.textContent
     data = data.replace(/\s*\[if\s+[^\]]+\]>\s*/, '')
     data = data.replace('<![endif]', '')
-    output.enter()
+    # output.enter()
     parser = new Parser()
     parser.parse data, (errors, window) =>
       @children window.document.body, output
-    output.leave()
+    # output.leave()
+    
+  script: (node, output, tagHead, tagAttr) ->
+    if @scalate
+      output.writeln ':javascript'
+      @writer.writeTextContent node, output, false, false, false
+    else
+      output.writeln "#{tagHead}#{tagAttr}"
+      @writer.writeTextContent node, output, false, true, false, true
+      
+  style: (node, output, tagHead, tagAttr) ->
+    if @scalate
+      output.writeln ':css'
+      @writer.writeTextContent node, output, false, false, false
+    else
+      output.writeln "#{tagHead}#{tagAttr}"
+      @writer.writeTextContent node, output, false, true, false
     
 class Output
   constructor: ->
@@ -300,9 +330,9 @@ if exports?
       if errors?.length
         errors
       else
-        options.output ?= new StreamOutput(process.stdout)
+        output ?= new StreamOutput(process.stdout)
         options.converter ?= new Converter(options)
-        options.converter.document window.document, options.output
+        options.converter.document window.document, output
 
 scope.convertHtml = (html, options, cb) ->
   options ?= {}
@@ -312,14 +342,18 @@ scope.convertHtml = (html, options, cb) ->
     if errors?.length
       errors
     else
-      options.output ?= new StringOutput()
+      output = options.output ? new StringOutput()
       options.converter ?= new Converter(options)
-      options.converter.document window.document, options.output
-      cb(null, options.output.final()) if cb?
+      options.converter.document window.document, output
+      cb(null, output.final()) if cb?
 
 scope.convertDocument = (document, options, cb) ->
   options ?= {}
-  options.output ?= new StringOutput()
+  output = options.output ? new StringOutput()
   options.converter ?= new Converter(options)
-  options.converter.document document, options.output
-  cb(null, options.output.final()) if cb?
+  options.converter.document document, output
+  cb(null, output.final()) if cb?
+
+# DEBUGGING
+# inspect = require('util').inspect
+# console.log "text parent node: #{inspect(parent)}"
