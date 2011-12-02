@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
-  "main": "./lib/html2jade.js",
+  "main": "index",
   "bin": {
     "html2jade": "./bin/html2jade"
   },
