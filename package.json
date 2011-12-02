@@ -1,10 +1,10 @@
 {
   "name": "html2jade",
   "description": "HTML to Jade conversion tool",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
-  "main": "./lib/html2jade.js",
+  "main": "index",
   "bin": {
     "html2jade": "./bin/html2jade"
   },
