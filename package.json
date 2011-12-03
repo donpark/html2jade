@@ -1,7 +1,7 @@
 {
   "name": "html2jade",
   "description": "HTML to Jade conversion tool",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
   "main": "index",

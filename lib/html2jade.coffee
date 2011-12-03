@@ -97,24 +97,23 @@ class Writer
             @writeTextLine line, output, pipe, trim, wrap
   
   breakLine: (line) ->
-    if line and line.length > 0
-      lines = []
-      words = line.split(/\s+/)
-      line = ''
-      while words.length
-        word = words.shift()
-        if line.length + word.length > @wrapLength
-          lines.push line
-          line = word
-        else if line.length
-          line += ' ' + word
-        else
-          line = word
-      if line.length
+    return [] if not line or line.length is 0
+    return [ line ] if line.search /\s+/ is -1
+    lines = []
+    words = line.split(/\s+/)
+    line = ''
+    while words.length
+      word = words.shift()
+      if line.length + word.length > @wrapLength
         lines.push line
-      lines
-    else
-      []
+        line = word
+      else if line.length
+        line += ' ' + word
+      else
+        line = word
+    if line.length
+      lines.push line
+    lines
 
 
 publicIdDocTypeNames =
