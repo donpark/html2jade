@@ -51,12 +51,9 @@ program
 program
   .command('*')
   .action(function () {
-    console.log("default action invoked: " + JSON.stringify(arguments));
-    
     var options = {
       scalate: program.scalate ? true : false
     };
-    console.log("options: " + JSON.stringify(options));
     
     // if outdir is provided, check existance (sorry no mkdir support yet)
     if (program.outdir && !path.existsSync(program.outdir)) {
@@ -78,7 +75,7 @@ program
           if (inputStats.isFile()) {
             var outdir = program.outdir || path.dirname(arg);
             var outputPath = path.join(outdir, path.basename(inputPath, path.extname(inputPath)) + '.jade');
-            console.log("converting '" + arg + "' to '" + outputPath + "'");
+            // console.log("converting '" + arg + "' to '" + outputPath + "'");
             var outputStream = fs.createWriteStream(outputPath, {
               flags: 'w',
               encoding: 'utf8',
