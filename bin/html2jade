@@ -63,8 +63,11 @@ program
     
     // process each input
     for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i];
-      if (url.parse(arg).protocol) {
+      var arg = arguments[i], inputUrl, inputPath;
+      if (typeof arg === 'string') {
+        try { inputUrl = url.parse(arg); } catch (err) {}
+      }
+      if (inputUrl && inputUrl.protocol) {
         // URL input, use stdout
         convert(arg, undefined, program);
       } else {
