@@ -44,52 +44,50 @@ function convert(input, output, options) {
 var program = require('commander');
 
 program
-  .version('0.1.0')
+  .version('0.1.15')
   .option('-s, --scalate', 'generate jade syntax compatible with Scalate')
   .option('-o, --outdir <dir>', 'path to output generated jade file(s) to', parsePath)
 
-program
-  .command('*')
-  .action(function () {
-    var options = {
-      scalate: program.scalate ? true : false
-    };
-    
-    // if outdir is provided, check existance (sorry no mkdir support yet)
-    if (program.outdir && !path.existsSync(program.outdir)) {
-      console.error("output directory '" + program.outdir + "' doesn't exist");
-      process.exit(1);
-    }
-    
-    // process each input
-    for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i], inputUrl, inputPath;
-      if (typeof arg === 'string') {
-        try { inputUrl = url.parse(arg); } catch (err) {}
-      }
-      if (inputUrl && inputUrl.protocol) {
-        // URL input, use stdout
-        convert(arg, undefined, program);
-      } else {
-        // path or glob
-        inputPath = parsePath(arg);
-        if (path.existsSync(inputPath)) {
-          var inputStats = fs.statSync(inputPath);
-          if (inputStats.isFile()) {
-            var outdir = program.outdir || path.dirname(arg);
-            var outputPath = path.join(outdir, path.basename(inputPath, path.extname(inputPath)) + '.jade');
-            // console.log("converting '" + arg + "' to '" + outputPath + "'");
-            var outputStream = fs.createWriteStream(outputPath, {
-              flags: 'w',
-              encoding: 'utf8',
-            });
-            convert(inputPath, new html2jade.StreamOutput(outputStream), program);
-          }
-        } else {
-          console.error("input file doesn't exist: " + arg);
-        }
-      }
-    }
-  });
-
 program.parse(process.argv);
+
+// if outdir is provided, check existance (sorry no mkdir support yet)
+if (program.outdir && !path.existsSync(program.outdir)) {
+  console.error("output directory '" + program.outdir + "' doesn't exist");
+  process.exit(1);
+}
+
+// process each arguments
+var args = program.args;
+if (!args || args.length === 0) {
+  console.error("input argument(s) missing");
+  process.exit(1);
+}
+
+for (var i = 0; i < args.length; i++) {
+  var arg = args[i], inputUrl, inputPath;
+  if (typeof arg === 'string') {
+    try { inputUrl = url.parse(arg); } catch (err) {}
+  }
+  if (inputUrl && inputUrl.protocol) {
+    // URL input, use stdout
+    convert(arg, undefined, program);
+  } else {
+    // path or glob
+    inputPath = parsePath(arg);
+    if (path.existsSync(inputPath)) {
+      var inputStats = fs.statSync(inputPath);
+      if (inputStats.isFile()) {
+        var outdir = program.outdir || path.dirname(arg);
+        var outputPath = path.join(outdir, path.basename(inputPath, path.extname(inputPath)) + '.jade');
+        // console.log("converting '" + arg + "' to '" + outputPath + "'");
+        var outputStream = fs.createWriteStream(outputPath, {
+          flags: 'w',
+          encoding: 'utf8',
+        });
+        convert(inputPath, new html2jade.StreamOutput(outputStream), program);
+      }
+    } else {
+      console.error("input file doesn't exist: " + arg);
+    }
+  }
+}
