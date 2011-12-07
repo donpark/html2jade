@@ -18,6 +18,10 @@ Outputs to file if input is file
     
     html2jade mywebpage.html # outputs mywebpage.jade
     html2jade public/*.html  # converts all .html files to .jade
+
+Convert HTML from `stdin`
+
+    cat mywebpage.html | html2jade - 
     
 To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 
