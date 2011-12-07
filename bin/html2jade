@@ -59,12 +59,27 @@ if (program.outdir && !path.existsSync(program.outdir)) {
 // process each arguments
 var args = program.args;
 if (!args || args.length === 0) {
-  console.error("input argument(s) missing");
-  process.exit(1);
+  args = ['-'];
+  // console.error("input argument(s) missing");
+  // process.exit(1);
 }
 
 for (var i = 0; i < args.length; i++) {
   var arg = args[i], inputUrl, inputPath;
+  
+  // handle stdin to stdout
+  if (arg === '-') {
+    var input = '';
+    process.stdin.resume();
+    process.stdin.on('data', function (chunk){
+      input += chunk;
+    });
+    process.stdin.on('end', function (){
+      convert(input, undefined, program);
+    });
+    continue;
+  }
+  
   if (typeof arg === 'string') {
     try { inputUrl = url.parse(arg); } catch (err) {}
   }
