@@ -2,6 +2,16 @@
 
 `html2jade` converts HTML into [Jade](https://github.com/visionmedia/jade) format.
 
+## Requirements
+
+`html2jade` currently supports OS X and Linux platforms.
+
+Windows is currently not supported because `html2jade` uses `jsdom` which in turn
+depends on native code module `Contextify`.
+
+For all other platforms, I recommend the [web version](http://html2jade.aaron-powell.com/)
+of `html2jade` kindly provided by [@aaronpowell](https://github.com/aaronpowell).
+
 ## Install ##
 
     npm install html2jade
