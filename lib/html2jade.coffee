@@ -32,14 +32,14 @@ class Writer
     
   tagAttr: (node) ->
     attrs = node.attributes
-    if attrs.length is 0
+    if not attrs or attrs.length is 0
       ''
     else
       result = []
       for attr in attrs
-        nodeName = attr.nodeName
-        if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
-          result.push attr.nodeName + '=\'' + attr.nodeValue.replace(/'/g, '\\\'') + '\''
+        if attr and nodeName = attr.nodeName
+          if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
+            result.push attr.nodeName + '=\'' + attr.nodeValue.replace(/'/g, '\\\'') + '\''
       if result.length > 0
         '(' + result.join(@attrSep) + ')'
       else
