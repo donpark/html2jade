@@ -23,7 +23,7 @@ class Writer
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id
       result += '#' + node.id
-    if node.hasAttribute('class')
+    if node.hasAttribute('class') and node.getAttribute('class').length > 0
       classes = node.getAttribute('class').split(/\s+/).filter (item) ->
         item? and item.trim().length > 0
       result += '.' + classes.join('.')
