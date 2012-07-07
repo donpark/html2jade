@@ -4,6 +4,8 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 
+var existsSync = fs.existsSync || path.existsSync;
+
 var html2jade;
 try {
     html2jade = require('html2jade');
@@ -51,7 +53,7 @@ program
 program.parse(process.argv);
 
 // if outdir is provided, check existance (sorry no mkdir support yet)
-if (program.outdir && !path.existsSync(program.outdir)) {
+if (program.outdir && !existsSync(program.outdir)) {
   console.error("output directory '" + program.outdir + "' doesn't exist");
   process.exit(1);
 }
@@ -89,7 +91,7 @@ for (var i = 0; i < args.length; i++) {
   } else {
     // path or glob
     inputPath = parsePath(arg);
-    if (path.existsSync(inputPath)) {
+    if (existsSync(inputPath)) {
       var inputStats = fs.statSync(inputPath);
       if (inputStats.isFile()) {
         var outdir = program.outdir || path.dirname(arg);
