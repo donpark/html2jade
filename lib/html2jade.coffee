@@ -3,16 +3,12 @@ scope = exports ? this.Html2Jade ?= {}
 class Parser
   constructor: (options = {}) ->
     @jsdom = require('jsdom')
-    
+      
   parse: (arg, cb) ->
-    if arg?
-      @jsdom.env arg, (errors, window) ->
-        if errors?.length
-          cb(errors)
-        else
-          cb(null, window)
-    else
+    if not arg
       cb('null file')
+    else
+      @jsdom.env arg, cb
 
 class Writer
   constructor: (options = {}) ->
@@ -176,6 +172,9 @@ class Converter
         @script node, output, tagHead, tagAttr
       else if tagName is 'style'
         @style node, output, tagHead, tagAttr
+    else if tagName is 'conditional'
+      output.writeln '//' + node.getAttribute('condition')
+      @children node, output
     else if ['pre'].indexOf(tagName) isnt -1
       # HACK: workaround jade's wonky PRE handling
       output.writeln tagHead + tagAttr + '.'
@@ -226,10 +225,7 @@ class Converter
     
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
-    if condition
-      output.writeln '//' + condition[1]
-      @conditional node, output
-    else
+    if not condition
       output.writeln '//'
       output.enter()
       data = node.data or ''
@@ -238,17 +234,22 @@ class Converter
         lines.forEach (line) =>
           @writer.writeTextLine line, output, false, false, false
       output.leave()
+    else
+      @conditional node, condition[1], output
+  
+  conditional: (node, condition, output) ->
+    # HACK: previous versions formally parsed content of conditional comments
+    # which didn't work client-side and was also implicitly dependent on
+    # parser operation being synchronous.
+    # 
+    # Replacement hack converts conditional comments into element type 'conditional'
+    # and relies on HTML DOM's innerHTML to parse textual content into DOM.
+    innerHTML = node.textContent.replace(/\s*\[if\s+[^\]]+\]>\s*/, '').replace('<![endif]', '')
+    conditionalElem = node.ownerDocument.createElement('conditional')
+    conditionalElem.setAttribute('condition', condition)
+    conditionalElem.innerHTML = innerHTML
+    node.parentNode.insertBefore conditionalElem, node.nextSibling
       
-  conditional: (node, output) ->
-    data = node.textContent
-    data = data.replace(/\s*\[if\s+[^\]]+\]>\s*/, '')
-    data = data.replace('<![endif]', '')
-    # output.enter()
-    parser = new Parser()
-    parser.parse data, (errors, window) =>
-      @children window.document.body, output
-    # output.leave()
-    
   script: (node, output, tagHead, tagAttr) ->
     if @scalate
       output.writeln ':javascript'
