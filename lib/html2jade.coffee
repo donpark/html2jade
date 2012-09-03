@@ -149,7 +149,7 @@ class Converter
         output.writeln '!!! ' + docTypeName
 
     if document.documentElement
-      @element document.documentElement, output
+      @children document, output, false
     else
       # documentElement is missing.
       # not sure why but this happens with jsdom when document has no body
@@ -203,8 +203,8 @@ class Converter
       output.writeln tagHead + tagAttr
       @children node, output
   
-  children: (parent, output) ->
-    output.enter()
+  children: (parent, output, indent = true) ->
+    output.enter() if indent
     @writer.forEachChild parent, (child) =>
       nodeType = child.nodeType
       if nodeType is 1 # element
@@ -216,7 +216,7 @@ class Converter
           @text child, output
       else if nodeType is 8 # comment
         @comment child, output
-    output.leave()
+    output.leave() if indent
     
   text: (node, output, pipe, trim, wrap) ->
     # console.log "text: #{node.data}"
@@ -226,14 +226,16 @@ class Converter
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
     if not condition
-      output.writeln '//'
-      output.enter()
       data = node.data or ''
-      if data.length > 0
+      if data.length is 0 or data.search(/\r|\n/) is -1
+        output.writeln "// #{data.trim()}"
+      else
+        output.writeln '//'
+        output.enter()
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
           @writer.writeTextLine line, output, false, false, false
-      output.leave()
+        output.leave()
     else
       @conditional node, condition[1], output
   
@@ -244,10 +246,14 @@ class Converter
     # 
     # Replacement hack converts conditional comments into element type 'conditional'
     # and relies on HTML DOM's innerHTML to parse textual content into DOM.
-    innerHTML = node.textContent.replace(/\s*\[if\s+[^\]]+\]>\s*/, '').replace('<![endif]', '')
+    innerHTML = node.textContent.trim().replace(/\s*\[if\s+[^\]]+\]>\s*/, '').replace('<![endif]', '')
+    # special-case handling of common conditional HTML element rick
+    if innerHTML.indexOf("<!") is 0
+      condition = " [#{condition}] <!"
+      innerHTML = null
     conditionalElem = node.ownerDocument.createElement('conditional')
     conditionalElem.setAttribute('condition', condition)
-    conditionalElem.innerHTML = innerHTML
+    conditionalElem.innerHTML = innerHTML if innerHTML
     node.parentNode.insertBefore conditionalElem, node.nextSibling
       
   script: (node, output, tagHead, tagAttr) ->
