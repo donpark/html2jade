@@ -3,7 +3,7 @@ scope = exports ? this.Html2Jade ?= {}
 class Parser
   constructor: (options = {}) ->
     @jsdom = require('jsdom')
-      
+
   parse: (arg, cb) ->
     if not arg
       cb('null file')
@@ -15,6 +15,12 @@ class Writer
     @wrapLength = options.wrapLength ? 80
     @scalate = options.scalate ? false
     @attrSep =if @scalate then ' ' else ', '
+    if options.double
+      @attrQuote = '"'
+      @nonAttrQuote = "'"
+    else
+      @attrQuote = "'"
+      @nonAttrQuote = '"'
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id
@@ -25,7 +31,7 @@ class Writer
       result += '.' + classes.join('.')
     result = 'div' if result.length is 0
     result
-    
+
   tagAttr: (node) ->
     attrs = node.attributes
     if not attrs or attrs.length is 0
@@ -35,12 +41,12 @@ class Writer
       for attr in attrs
         if attr and nodeName = attr.nodeName
           if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
-            result.push attr.nodeName + '=\'' + attr.nodeValue.replace(/'/g, '\\\'') + '\''
+            result.push attr.nodeName + "=" + @attrQuote + attr.nodeValue.replace(new RegExp(@attrQuote, 'g'), @nonAttrQuote) + @attrQuote
       if result.length > 0
         '(' + result.join(@attrSep) + ')'
       else
         ''
-  
+
   tagText: (node) ->
     if node.firstChild?.nodeType isnt 3
       null
@@ -52,14 +58,14 @@ class Writer
         null
       else
         data
-  
+
   forEachChild: (parent, cb) ->
     if parent
       child = parent.firstChild
       while child
         cb(child)
         child = child.nextSibling
-    
+
   writeTextContent: (node, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
     output.enter()
     @forEachChild node, (child) =>
@@ -74,7 +80,7 @@ class Writer
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
           @writeTextLine line, output, pipe, trim, wrap, escapeBackslash
-              
+
   writeTextLine: (line, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
     prefix = if pipe then '| ' else ''
     if trim
@@ -91,7 +97,7 @@ class Writer
         else
           lines.forEach (line) =>
             @writeTextLine line, output, pipe, trim, wrap
-  
+
   breakLine: (line) ->
     return [] if not line or line.length is 0
     return [ line ] if line.search /\s+/ is -1
@@ -119,7 +125,7 @@ publicIdDocTypeNames =
   "-//W3C//DTD XHTML 1.1//EN":        "1.1"
   "-//W3C//DTD XHTML Basic 1.1//EN":      "basic"
   "-//WAPFORUM//DTD XHTML Mobile 1.2//EN":  "mobile"
-  
+
 systemIdDocTypeNames =
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd":      "transitional"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd":        "strict"
@@ -127,12 +133,12 @@ systemIdDocTypeNames =
   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd":           "1.1"
   "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd":       "basic"
   "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd":  "mobile"
-  
+
 class Converter
   constructor: (options = {}) ->
     @scalate = options.scalate ? false
     @writer = options.writer ? new Writer(options)
-    
+
   document: (document, output) ->
     if document.doctype?
       doctype = document.doctype
@@ -202,7 +208,7 @@ class Converter
     else
       output.writeln tagHead + tagAttr
       @children node, output
-  
+
   children: (parent, output, indent = true) ->
     output.enter() if indent
     @writer.forEachChild parent, (child) =>
@@ -217,12 +223,12 @@ class Converter
       else if nodeType is 8 # comment
         @comment child, output
     output.leave() if indent
-    
+
   text: (node, output, pipe, trim, wrap) ->
     # console.log "text: #{node.data}"
     node.normalize()
     @writer.writeText node, output, pipe, trim, wrap
-    
+
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
     if not condition
@@ -238,12 +244,12 @@ class Converter
         output.leave()
     else
       @conditional node, condition[1], output
-  
+
   conditional: (node, condition, output) ->
     # HACK: previous versions formally parsed content of conditional comments
     # which didn't work client-side and was also implicitly dependent on
     # parser operation being synchronous.
-    # 
+    #
     # Replacement hack converts conditional comments into element type 'conditional'
     # and relies on HTML DOM's innerHTML to parse textual content into DOM.
     innerHTML = node.textContent.trim().replace(/\s*\[if\s+[^\]]+\]>\s*/, '').replace('<![endif]', '')
@@ -255,7 +261,7 @@ class Converter
     conditionalElem.setAttribute('condition', condition)
     conditionalElem.innerHTML = innerHTML if innerHTML
     node.parentNode.insertBefore conditionalElem, node.nextSibling
-      
+
   script: (node, output, tagHead, tagAttr) ->
     if @scalate
       output.writeln ':javascript'
@@ -263,7 +269,7 @@ class Converter
     else
       output.writeln "#{tagHead}#{tagAttr}"
       @writer.writeTextContent node, output, false, true, false, true
-      
+
   style: (node, output, tagHead, tagAttr) ->
     if @scalate
       output.writeln ':css'
@@ -271,7 +277,7 @@ class Converter
     else
       output.writeln "#{tagHead}#{tagAttr}"
       @writer.writeTextContent node, output, false, true, false
-    
+
 class Output
   constructor: ->
     @indents = ''
@@ -302,7 +308,7 @@ class StringOutput extends Output
     result = @fragments.join ''
     @fragments = []
     result
-    
+
 class StreamOutput extends Output
   constructor: (@stream) ->
     super
@@ -318,7 +324,7 @@ class StreamOutput extends Output
       @stream.write @indents + data + '\n'
     else
       @stream.write data + '\n'
-  
+
 scope.Output = Output
 scope.StringOutput = StringOutput
 scope.Converter = Converter
