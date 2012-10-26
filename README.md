@@ -41,7 +41,13 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
     html2jade --scalate http://twitter.com > twitter.jade
     html2jade --scalate mywebpage.html
     html2jade --scalate public/*.html
-    
+
+### Command-line Options ###
+
+* `-d, --double` - use double quotes for attributes
+* `-s, --scalate` - generate jade syntax compatible with Scalate
+* `-o, --outdir <dir>` - path to output generated jade file(s) to
+
 ## Programmatic Usage (>= 0.0.7)
     
 To convert raw HTML into Jade:
