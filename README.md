@@ -9,11 +9,6 @@
 Windows is currently not supported because `html2jade` uses `jsdom` which in turn
 depends on native code module `Contextify`.
 
-## Web version
-
-There is a [web version](http://html2jade.aaron-powell.com/) of `html2jade`,
-kindly provided by [@aaronpowell](https://github.com/aaronpowell).
-
 ## Install ##
 
     npm install html2jade
@@ -70,3 +65,15 @@ To convert DOM document into Jade (client-side):
 Mostly usable but sometimes requires fixing up, usually involving conditionals and scripts indentation.
 
 While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
+
+## Tools using `html2jade` ##
+
+### Web version ###
+
+There is a [web version](http://html2jade.aaron-powell.com/) of `html2jade`,
+kindly provided by [@aaronpowell](https://github.com/aaronpowell).
+
+### Linux trap app ###
+
+[Miniclip](http://myguidingstar.github.com/miniclip/) is a Linux tray app that quickly converts
+HTML to Jade, CSS to Stylus and JS to Coffee from clipboard.
