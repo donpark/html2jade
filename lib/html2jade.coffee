@@ -24,7 +24,7 @@ class Writer
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id
-      result += '#' + node.id
+      result += "##{node.id}"
     if node.hasAttribute('class') and node.getAttribute('class').length > 0
       classes = node.getAttribute('class').split(/\s+/).filter (item) ->
         item? and item.trim().length > 0
@@ -32,7 +32,7 @@ class Writer
     result = 'div' if result.length is 0
     result
 
-  tagAttr: (node) ->
+  tagAttr: (node, indents = '') ->
     attrs = node.attributes
     if not attrs or attrs.length is 0
       ''
@@ -41,9 +41,12 @@ class Writer
       for attr in attrs
         if attr and nodeName = attr.nodeName
           if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
-            result.push attr.nodeName + "=" + @attrQuote + attr.nodeValue.replace(new RegExp(@attrQuote, 'g'), @nonAttrQuote) + @attrQuote
+            attrValue = attr.nodeValue
+            attrValue = attrValue.replace(new RegExp(@attrQuote, 'g'), @nonAttrQuote)
+            attrValue = attrValue.replace(/(\r|\n)\s*/g, "\\$1#{indents}")
+            result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
       if result.length > 0
-        '(' + result.join(@attrSep) + ')'
+        "(#{result.join(@attrSep)})"
       else
         ''
 
@@ -168,7 +171,7 @@ class Converter
     # console.log "tag: #{node.tagName}"
     tagName = node.tagName.toLowerCase()
     tagHead = @writer.tagHead node
-    tagAttr = @writer.tagAttr node
+    tagAttr = @writer.tagAttr node, output.indents
     tagText = @writer.tagText node
     if tagName is 'script' or tagName is 'style'
       if node.hasAttribute('src')
