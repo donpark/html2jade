@@ -77,3 +77,9 @@ kindly provided by [@aaronpowell](https://github.com/aaronpowell).
 
 [Miniclip](http://myguidingstar.github.com/miniclip/) is a Linux tray app that quickly converts
 HTML to Jade, CSS to Stylus and JS to Coffee from clipboard.
+
+## Testing ##
+
+As of version 0.4, there is a simple unit test that converts HTML files in `test/data` directory
+and compare them against Jade files in the same directory. Unit test harness requires `coffee-script`
+and `mocha` to be installed globally. Run the tests with command `npm test`.
