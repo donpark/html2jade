@@ -5,7 +5,7 @@
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
   "license": "BSD",
-  "main": "index",
+  "main": "./lib/html2jade.js",
   "bin": {
     "html2jade": "./bin/html2jade"
   },
