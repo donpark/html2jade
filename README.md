@@ -11,7 +11,7 @@ depends on native code module `Contextify`.
 
 ## Install ##
 
-    npm install html2jade
+    npm install -g html2jade
 
 ## Command-line Usage ##
 
