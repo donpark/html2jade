@@ -73,7 +73,7 @@ While converting a fairly complicated theme package with ~20 HTML files, I had t
 There is a [web version](http://html2jade.aaron-powell.com/) of `html2jade`,
 kindly provided by [@aaronpowell](https://github.com/aaronpowell).
 
-### Linux trap app ###
+### Linux tray app ###
 
 [Miniclip](http://myguidingstar.github.com/miniclip/) is a Linux tray app that quickly converts
 HTML to Jade, CSS to Stylus and JS to Coffee from clipboard.
