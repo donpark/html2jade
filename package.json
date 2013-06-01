@@ -1,19 +1,20 @@
 {
   "name": "html2jade",
   "description": "HTML to Jade conversion tool",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
   "license": "BSD",
   "main": "./lib/html2jade.js",
   "bin": {
-    "html2jade": "./bin/html2jade"
+    "html2jade": "./cli.js"
   },
   "scripts": {
+    "prepublish": "coffee -c lib",
     "test": "mocha"
   },
   "dependencies": {
-    "jsdom": "<= 0.6.2",
+    "jsdom": ">= 0.x",
     "commander": ">= 0.x"
   },
   "devDependencies": {

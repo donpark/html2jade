@@ -10,7 +10,7 @@ var html2jade;
 try {
     html2jade = require('html2jade');
 } catch(err) {
-    html2jade = require('../lib/html2jade');
+    html2jade = require('./lib/html2jade');
 }
 
 function parsePath(arg) {
@@ -46,7 +46,7 @@ function convert(input, output, options) {
 var program = require('commander');
 
 program
-  .version('0.4.1')
+  .version('0.4.3')
   .option('-d, --double', 'use double quotes for attributes')
   .option('-s, --scalate', 'generate jade syntax compatible with Scalate')
   .option('-o, --outdir <dir>', 'path to output generated jade file(s) to', parsePath)
@@ -78,6 +78,7 @@ for (var i = 0; i < args.length; i++) {
       input += chunk;
     });
     process.stdin.on('end', function (){
+      program.inputType = "html";
       convert(input, undefined, program);
     });
     continue;
@@ -88,6 +89,7 @@ for (var i = 0; i < args.length; i++) {
   }
   if (inputUrl && inputUrl.protocol) {
     // URL input, use stdout
+    program.inputType = "url";
     convert(arg, undefined, program);
   } else {
     // path or glob
@@ -102,6 +104,7 @@ for (var i = 0; i < args.length; i++) {
           flags: 'w',
           encoding: 'utf8',
         });
+        program.inputType = "file";
         convert(inputPath, new html2jade.StreamOutput(outputStream), program);
       }
     } else {

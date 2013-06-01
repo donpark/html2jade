@@ -1,13 +1,18 @@
+FS = require("fs")
+Path = require("path")
+
 scope = exports ? this.Html2Jade ?= {}
 
 class Parser
-  constructor: (options = {}) ->
+  constructor: (@options = {}) ->
     @jsdom = require('jsdom')
 
   parse: (arg, cb) ->
     if not arg
       cb('null file')
     else
+      # workaround jsdom file path mishandling issue in 0.6.3+
+      arg = FS.readFileSync(arg, encoding: "utf8") if @options.inputType is "file"
       @jsdom.env arg, cb
 
 class Writer

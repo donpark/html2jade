@@ -6,10 +6,10 @@ child_process = require('child_process')
 async = require('async')
 
 exec = child_process.exec
-existsSync = path.existsSync or fs.existsSync
+existsSync = fs.existsSync or path.existsSync
 
 html2jade = (inputFile, outputDir, cb) ->
-  cmd = "../bin/html2jade #{inputFile} -o #{outputDir}"
+  cmd = "../cli.js #{inputFile} -o #{outputDir}"
   options =
     cwd: __dirname
   # console.log cmd
