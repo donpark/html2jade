@@ -12,7 +12,7 @@ class Parser
       cb('null file')
     else
       # workaround jsdom file path mishandling issue in 0.6.3+
-      arg = FS.readFileSync(arg, encoding: "utf8") if @options.inputType is "file"
+      arg = FS.readFileSync(arg, "utf8") if @options.inputType is "file"
       @jsdom.env arg, cb
 
 class Writer
