@@ -2,6 +2,7 @@ FS = require("fs")
 Path = require("path")
 
 scope = exports ? this.Html2Jade ?= {}
+nspaces = 2 # default
 
 class Parser
   constructor: (@options = {}) ->
@@ -290,9 +291,9 @@ class Output
   constructor: ->
     @indents = ''
   enter: ->
-    @indents += '  '
+    @indents += ' ' for i in [1..nspaces]
   leave: ->
-    @indents = @indents.substring(2)
+    @indents = @indents.substring(nspaces)
   write: (data, indent=true) ->
   writeln: (data, indent=true) ->
 
@@ -343,6 +344,8 @@ if exports?
   scope.Parser = Parser
   scope.StreamOutput = StreamOutput
   scope.convert = (input, output, options) ->
+    if options.nspaces
+      nspaces = options.nspaces
     options ?= {}
     # specify parser and converter to override default instance
     options.parser ?= new Parser(options)

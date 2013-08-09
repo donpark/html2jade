@@ -42,6 +42,7 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `-d, --double` - use double quotes for attributes
 * `-s, --scalate` - generate jade syntax compatible with Scalate
 * `-o, --outdir <dir>` - path to output generated jade file(s) to
+* `-n, --nspaces <n>` - the number of spaces to indent generated files with. Default is 2 spaces
 
 ## Programmatic Usage (>= 0.0.7)
     
