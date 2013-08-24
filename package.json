@@ -1,7 +1,7 @@
 {
   "name": "html2jade",
   "description": "HTML to Jade conversion tool",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "author": "Don Park <donpark@docuverse.com>",
   "repository": "git://github.com/donpark/html2jade.git",
   "license": "BSD",
@@ -14,8 +14,9 @@
     "test": "mocha"
   },
   "dependencies": {
-    "jsdom": ">= 0.x",
-    "commander": ">= 0.x"
+    "commander": "*",
+    "ent": "*",
+    "jsdom": "*"
   },
   "devDependencies": {
     "async": "*"

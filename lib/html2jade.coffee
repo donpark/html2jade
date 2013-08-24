@@ -1,5 +1,6 @@
 FS = require("fs")
 Path = require("path")
+Ent = require("ent")
 
 scope = exports ? this.Html2Jade ?= {}
 nspaces = 2 # default
@@ -75,27 +76,33 @@ class Writer
         cb(child)
         child = child.nextSibling
 
-  writeTextContent: (node, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
+  writeTextContent: (node, output, options) ->
     output.enter()
     @forEachChild node, (child) =>
-      @writeText child, output, pipe, trim, wrap, escapeBackslash
+      @writeText child, output, options
     output.leave()
 
 
-  writeText: (node, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
+  writeText: (node, output, options) ->
     if node.nodeType is 3
       data = node.data or ''
       if data.length > 0
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          @writeTextLine line, output, pipe, trim, wrap, escapeBackslash
+          @writeTextLine line, output, options
 
-  writeTextLine: (line, output, pipe = true, trim = true, wrap = true, escapeBackslash = false) ->
+  writeTextLine: (line, output, options = {}) ->
+    pipe = options.pipe ? true
+    trim = options.trim ? true
+    wrap = options.wrap ? true
+    encodeEntityRef = options.encodeEntityRef ? false
+    escapeBackslash = options.escapeBackslash ? false
     prefix = if pipe then '| ' else ''
     if trim
       line = if line then line.trim() else ''
     if line and line.length > 0
       # escape backslash
+      line = Ent.encode(line) if encodeEntityRef
       line = line.replace("\\", "\\\\") if escapeBackslash
       if not wrap or line.length <= @wrapLength
         output.writeln prefix + line
@@ -105,7 +112,7 @@ class Writer
           output.writeln prefix + line
         else
           lines.forEach (line) =>
-            @writeTextLine line, output, pipe, trim, wrap
+            @writeTextLine line, output, options
 
   breakLine: (line) ->
     return [] if not line or line.length is 0
@@ -182,7 +189,10 @@ class Converter
     if tagName is 'script' or tagName is 'style'
       if node.hasAttribute('src')
         output.writeln tagHead + tagAttr
-        @writer.writeTextContent node, output, false, false, false
+        @writer.writeTextContent node, output,
+          pipe: false
+          trim: false
+          wrap: false
       else if tagName is 'script'
         @script node, output, tagHead, tagAttr
       else if tagName is 'style'
@@ -213,7 +223,7 @@ class Converter
     else if tagText
       if tagText.length > 0 and tagText.charAt(0) is '='
         tagText = '\\' + tagText
-      output.writeln tagHead + tagAttr + ' ' + tagText
+      output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText)
     else
       output.writeln tagHead + tagAttr
       @children node, output
@@ -226,17 +236,20 @@ class Converter
         @element child, output
       else if nodeType is 3 # text
         if parent._nodeName is 'code'
-          @text child, output, false, true, true
+          @text child, output,
+            encodeEntityRef: true
+            pipe: false
         else
-          @text child, output
+          @text child, output,
+            encodeEntityRef: true
       else if nodeType is 8 # comment
         @comment child, output
     output.leave() if indent
 
-  text: (node, output, pipe, trim, wrap) ->
+  text: (node, output, options) ->
     # console.log "text: #{node.data}"
     node.normalize()
-    @writer.writeText node, output, pipe, trim, wrap
+    @writer.writeText node, output, options
 
   comment: (node, output) ->
     condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
@@ -249,7 +262,10 @@ class Converter
         output.enter()
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          @writer.writeTextLine line, output, false, false, false
+          @writer.writeTextLine line, output,
+            pipe: false
+            trim: false
+            wrap: false
         output.leave()
     else
       @conditional node, condition[1], output
@@ -274,18 +290,29 @@ class Converter
   script: (node, output, tagHead, tagAttr) ->
     if @scalate
       output.writeln ':javascript'
-      @writer.writeTextContent node, output, false, false, false
+      @writer.writeTextContent node, output,
+        pipe: false
+        trim: false
+        wrap: false
     else
       output.writeln "#{tagHead}#{tagAttr}"
-      @writer.writeTextContent node, output, false, true, false, true
+      @writer.writeTextContent node, output,
+        pipe: false
+        wrap: false
+        escapeBackslash: true
 
   style: (node, output, tagHead, tagAttr) ->
     if @scalate
       output.writeln ':css'
-      @writer.writeTextContent node, output, false, false, false
+      @writer.writeTextContent node, output,
+        pipe: false
+        trim: false
+        wrap: false
     else
       output.writeln "#{tagHead}#{tagAttr}"
-      @writer.writeTextContent node, output, false, true, false
+      @writer.writeTextContent node, output,
+        pipe: false
+        wrap: false
 
 class Output
   constructor: ->
