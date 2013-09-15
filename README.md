@@ -1,4 +1,5 @@
 # html2jade #
+[![Build Status](https://travis-ci.org/donpark/html2jade.png?branch=master)](https://travis-ci.org/donpark/html2jade)
 
 `html2jade` converts HTML into [Jade](https://github.com/visionmedia/jade) format.
 

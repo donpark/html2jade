@@ -19,7 +19,9 @@
     "jsdom": "*"
   },
   "devDependencies": {
-    "async": "*"
+    "async": "*",
+    "mocha": "~1.12.1",
+    "coffee-script": "~1.6.3"
   },
   "engines": {
     "node": ">= 0.4.0"
