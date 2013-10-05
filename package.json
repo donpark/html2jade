@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prepublish": "coffee -c lib",
-    "test": "mocha"
+    "test": "node ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
     "commander": "*",
