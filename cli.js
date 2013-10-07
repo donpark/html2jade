@@ -44,9 +44,10 @@ function convert(input, output, options) {
 }
 
 var program = require('commander');
+var version = require('./package').version;
 
 program
-  .version('0.5.0')
+  .version(version)
   .option('-d, --double', 'use double quotes for attributes')
   .option('-s, --scalate', 'generate jade syntax compatible with Scalate')
   .option('-t, --tabs', 'use tabs instead of spaces')
