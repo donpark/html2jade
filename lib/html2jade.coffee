@@ -4,6 +4,7 @@ Ent = require("ent")
 
 scope = exports ? this.Html2Jade ?= {}
 nspaces = 2 # default
+useTabs = false
 
 class Parser
   constructor: (@options = {}) ->
@@ -318,9 +319,15 @@ class Output
   constructor: ->
     @indents = ''
   enter: ->
-    @indents += ' ' for i in [1..nspaces]
+    if useTabs
+      @indents += '\t'
+    else
+      @indents += ' ' for i in [1..nspaces]
   leave: ->
-    @indents = @indents.substring(nspaces)
+    if useTabs
+      @indents = @indents.substring(1)
+    else
+      @indents = @indents.substring(nspaces)
   write: (data, indent=true) ->
   writeln: (data, indent=true) ->
 
@@ -373,6 +380,8 @@ if exports?
   scope.convert = (input, output, options) ->
     if options.nspaces
       nspaces = options.nspaces
+    if options.tabs
+      useTabs = true
     options ?= {}
     # specify parser and converter to override default instance
     options.parser ?= new Parser(options)
