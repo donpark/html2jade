@@ -49,6 +49,7 @@ program
   .version('0.5.0')
   .option('-d, --double', 'use double quotes for attributes')
   .option('-s, --scalate', 'generate jade syntax compatible with Scalate')
+  .option('-t, --tabs', 'use tabs instead of spaces')
   .option('-o, --outdir <dir>', 'path to output generated jade file(s) to', parsePath)
   .option('-n, --nspaces <n>', 'the number of spaces to indent generated files with', parseInt)
 
