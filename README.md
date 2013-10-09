@@ -45,6 +45,7 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `-o, --outdir <dir>` - path to output generated jade file(s) to
 * `-n, --nspaces <n>` - the number of spaces to indent generated files with. Default is 2 spaces
 * `-t, --tabs` - use tabs instead of spaces
+* `--donotencode` - do not html encode characters. This is useful for template files which may contain expressions like {{username}}
 
 ## Programmatic Usage (>= 0.0.7)
     
