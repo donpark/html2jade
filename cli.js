@@ -53,6 +53,7 @@ program
   .option('-t, --tabs', 'use tabs instead of spaces')
   .option('-o, --outdir <dir>', 'path to output generated jade file(s) to', parsePath)
   .option('-n, --nspaces <n>', 'the number of spaces to indent generated files with', parseInt)
+  .option('--donotencode', 'do not html encode characters (useful for templates)')
 
 program.parse(process.argv);
 
