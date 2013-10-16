@@ -3,8 +3,10 @@ Path = require("path")
 Ent = require("ent")
 
 scope = exports ? this.Html2Jade ?= {}
+
 nspaces = 2 # default
 useTabs = false
+doNotEncode = false
 
 class Parser
   constructor: (@options = {}) ->
@@ -224,7 +226,11 @@ class Converter
     else if tagText
       if tagText.length > 0 and tagText.charAt(0) is '='
         tagText = '\\' + tagText
-      output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText)
+      if doNotEncode
+        # do not encode tagText - for template variables like {{username}} inside of tags
+        output.writeln tagHead + tagAttr + ' ' + tagText
+      else
+        output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText)
     else
       output.writeln tagHead + tagAttr
       @children node, output
@@ -242,7 +248,11 @@ class Converter
             pipe: false
         else
           @text child, output,
-            encodeEntityRef: true
+            if doNotEncode
+              # do not encode text that is part of a template
+              encodeEntityRef: false
+            else
+              encodeEntityRef: true
       else if nodeType is 8 # comment
         @comment child, output
     output.leave() if indent
@@ -382,6 +392,8 @@ if exports?
       nspaces = options.nspaces
     if options.tabs
       useTabs = true
+    if options.donotencode
+      doNotEncode = true
     options ?= {}
     # specify parser and converter to override default instance
     options.parser ?= new Parser(options)
