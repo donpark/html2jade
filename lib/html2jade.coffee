@@ -169,9 +169,9 @@ class Converter
       else if systemId? and systemIdDocTypeNames[systemId]?
         docTypeName = systemIdDocTypeNames[systemId]?
       else if doctype.name? and doctype.name.toLowerCase() is 'html'
-        docTypeName = '5'
+        docTypeName = 'html'
       if docTypeName?
-        output.writeln '!!! ' + docTypeName
+        output.writeln 'doctype ' + docTypeName
 
     if document.documentElement
       @children document, output, false
