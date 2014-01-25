@@ -224,8 +224,6 @@ class Converter
       output.writeln()
       output.leave()
     else if tagText
-      if tagText.length > 0 and tagText.charAt(0) is '='
-        tagText = '\\' + tagText
       if doNotEncode
         # do not encode tagText - for template variables like {{username}} inside of tags
         output.writeln tagHead + tagAttr + ' ' + tagText
