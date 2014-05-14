@@ -154,9 +154,9 @@ systemIdDocTypeNames =
   "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd":  "mobile"
 
 class Converter
-  constructor: (options = {}) ->
-    @scalate = options.scalate ? false
-    @writer = options.writer ? new Writer(options)
+  constructor: (@options = {}) ->
+    @scalate = @options.scalate ? false
+    @writer = @options.writer ? new Writer(@options)
 
   document: (document, output) ->
     if document.doctype?
@@ -223,6 +223,8 @@ class Converter
             output.write data
       output.writeln()
       output.leave()
+    else if @options.bodyless and (tagName is 'html' or tagName is 'body')
+      @children node, output, false
     else if tagText
       if doNotEncode
         # do not encode tagText - for template variables like {{username}} inside of tags

@@ -19,18 +19,18 @@ depends on native code module `Contextify`.
 Outputs to stdout if input is URL
 
     html2jade http://twitter.com
-    
+
     html2jade http://twitter.com > twitter.jade
-    
+
 Outputs to file if input is file
-    
+
     html2jade mywebpage.html # outputs mywebpage.jade
     html2jade public/*.html  # converts all .html files to .jade
 
 Convert HTML from `stdin`
 
-    cat mywebpage.html | html2jade - 
-    
+    cat mywebpage.html | html2jade -
+
 To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 
     html2jade --scalate http://twitter.com
@@ -46,9 +46,10 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `-n, --nspaces <n>` - the number of spaces to indent generated files with. Default is 2 spaces
 * `-t, --tabs` - use tabs instead of spaces
 * `--donotencode` - do not html encode characters. This is useful for template files which may contain expressions like {{username}}
+* `--bodyless` - do not output enveloping html and body tags
 
 ## Programmatic Usage (>= 0.0.7)
-    
+
 To convert raw HTML into Jade:
 
     var html2jade = require('html2jade');
@@ -56,7 +57,7 @@ To convert raw HTML into Jade:
     html2jade.convertHtml(html, {}, function (err, jade) {
       // do your thing
     });
-    
+
 To convert DOM document into Jade (client-side):
 
     // assumes html2jade.js file has been loaded
