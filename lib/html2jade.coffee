@@ -385,19 +385,19 @@ scope.StringOutput = StringOutput
 scope.Converter = Converter
 scope.Writer = Writer
 
+applyOptions = (options) ->
+  entOptions.numeric = true if options.numeric
+  nspaces = options.nspaces if options.nspaces
+  useTabs = true if options.tabs
+  doNotEncode = true if options.donotencode
+
 # node.js classes
 if exports?
   scope.Parser = Parser
   scope.StreamOutput = StreamOutput
-  scope.convert = (input, output, options) ->
-    entOptions.numeric = true if options.numeric
-    if options.nspaces
-      nspaces = options.nspaces
-    if options.tabs
-      useTabs = true
-    if options.donotencode
-      doNotEncode = true
-    options ?= {}
+  scope.convert = (input, output, options = {}) ->
+    applyOptions options
+
     # specify parser and converter to override default instance
     options.parser ?= new Parser(options)
     options.parser.parse input, (errors, window) ->
@@ -408,9 +408,9 @@ if exports?
         options.converter ?= new Converter(options)
         options.converter.document window.document, output
 
-scope.convertHtml = (html, options, cb) ->
-  options ?= {}
-  entOptions.numeric = true if options.numeric
+scope.convertHtml = (html, options = {}, cb) ->
+  applyOptions options
+
   # specify parser and converter to override default instance
   options.parser ?= new Parser(options)
   options.parser.parse html, (errors, window) ->
@@ -422,9 +422,9 @@ scope.convertHtml = (html, options, cb) ->
       options.converter.document window.document, output
       cb(null, output.final()) if cb?
 
-scope.convertDocument = (document, options, cb) ->
-  options ?= {}
-  entOptions.numeric = true if options.numeric
+scope.convertDocument = (document, options = {}, cb) ->
+  applyOptions options
+
   output = options.output ? new StringOutput()
   options.converter ?= new Converter(options)
   options.converter.document document, output
