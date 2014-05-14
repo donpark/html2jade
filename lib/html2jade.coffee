@@ -8,6 +8,8 @@ nspaces = 2 # default
 useTabs = false
 doNotEncode = false
 
+entOptions = numeric: false
+
 class Parser
   constructor: (@options = {}) ->
     @jsdom = require('jsdom')
@@ -105,7 +107,7 @@ class Writer
       line = if line then line.trim() else ''
     if line and line.length > 0
       # escape backslash
-      line = Ent.encode(line) if encodeEntityRef
+      line = Ent.encode(line, entOptions) if encodeEntityRef
       line = line.replace("\\", "\\\\") if escapeBackslash
       if not wrap or line.length <= @wrapLength
         output.writeln prefix + line
@@ -230,7 +232,7 @@ class Converter
         # do not encode tagText - for template variables like {{username}} inside of tags
         output.writeln tagHead + tagAttr + ' ' + tagText
       else
-        output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText)
+        output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText, entOptions)
     else
       output.writeln tagHead + tagAttr
       @children node, output
@@ -388,6 +390,7 @@ if exports?
   scope.Parser = Parser
   scope.StreamOutput = StreamOutput
   scope.convert = (input, output, options) ->
+    entOptions.numeric = true if options.numeric
     if options.nspaces
       nspaces = options.nspaces
     if options.tabs
@@ -407,6 +410,7 @@ if exports?
 
 scope.convertHtml = (html, options, cb) ->
   options ?= {}
+  entOptions.numeric = true if options.numeric
   # specify parser and converter to override default instance
   options.parser ?= new Parser(options)
   options.parser.parse html, (errors, window) ->
@@ -420,6 +424,7 @@ scope.convertHtml = (html, options, cb) ->
 
 scope.convertDocument = (document, options, cb) ->
   options ?= {}
+  entOptions.numeric = true if options.numeric
   output = options.output ? new StringOutput()
   options.converter ?= new Converter(options)
   options.converter.document document, output

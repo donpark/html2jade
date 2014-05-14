@@ -55,6 +55,7 @@ program
   .option('-n, --nspaces <n>', 'the number of spaces to indent generated files with', parseInt)
   .option('--donotencode', 'do not html encode characters (useful for templates)')
   .option('--bodyless', 'do not output enveloping html and body tags')
+  .option('--numeric', 'use numeric character entities')
 
 program.parse(process.argv);
 

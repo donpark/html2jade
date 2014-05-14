@@ -47,6 +47,7 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `-t, --tabs` - use tabs instead of spaces
 * `--donotencode` - do not html encode characters. This is useful for template files which may contain expressions like {{username}}
 * `--bodyless` - do not output enveloping html and body tags
+* `--numeric` - use numeric character entities
 
 ## Programmatic Usage (>= 0.0.7)
 
