@@ -12,7 +12,7 @@ entOptions = numeric: false
 
 class Parser
   constructor: (@options = {}) ->
-    @jsdom = require('jsdom')
+    @jsdom = require('jsdom-little')
 
   parse: (arg, cb) ->
     if not arg
