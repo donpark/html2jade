@@ -5,10 +5,9 @@
 
 ## Requirements
 
-`html2jade` currently supports OS X and Linux platforms.
+`html2jade` version prior to 0.7 support OS X and Linux only.
 
-Windows is currently not supported because `html2jade` uses `jsdom` which in turn
-depends on native code module `Contextify`.
+`html2jade` version 0.7+ should support OS X, Windows, and Linux.
 
 ## Install ##
 
