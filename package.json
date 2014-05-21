@@ -16,7 +16,7 @@
   "dependencies": {
     "commander": "*",
     "ent": "*",
-    "jsdom": "~0.6"
+    "jsdom-little": "^0.10.5"
   },
   "devDependencies": {
     "async": "*",

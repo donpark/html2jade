@@ -9,7 +9,7 @@ exec = child_process.exec
 existsSync = fs.existsSync or path.existsSync
 
 html2jade = (inputFile, outputDir, cb) ->
-  cmd = "../cli.js #{inputFile} -o #{outputDir}"
+  cmd = "node ../cli.js #{inputFile} -o #{outputDir}"
   options =
     cwd: __dirname
   # console.log cmd

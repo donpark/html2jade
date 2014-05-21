@@ -16,7 +16,7 @@ try {
 function parsePath(arg) {
   if (typeof arg !== 'string') {
     console.error('invalid input: ' + arg);
-  } else if (arg[0] === '/') {
+  } else if (path.resolve('/',arg) === arg) {
     // already absolute path
     return arg;
   } else if (arg.length >= 2 && arg.substring(0, 2) === '~/') {
@@ -90,7 +90,7 @@ for (var i = 0; i < args.length; i++) {
     continue;
   }
 
-  if (typeof arg === 'string') {
+  if (typeof arg === 'string' && !existsSync(arg)) {
     try { inputUrl = url.parse(arg); } catch (err) {}
   }
   if (inputUrl && inputUrl.protocol) {
