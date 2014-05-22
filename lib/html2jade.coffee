@@ -33,6 +33,7 @@ class Writer
     else
       @attrQuote = "'"
       @nonAttrQuote = '"'
+    @attrQuoteEscaped = "\\#{@attrQuote}"
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id
@@ -54,9 +55,14 @@ class Writer
         if attr and nodeName = attr.nodeName
           if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
             attrValue = attr.nodeValue
-            attrValue = attrValue.replace(new RegExp(@attrQuote, 'g'), @nonAttrQuote)
             attrValue = attrValue.replace(/(\r|\n)\s*/g, "\\$1#{indents}")
-            result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
+            if attrValue.indexOf(@attrQuote) is -1
+              result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
+            else if attrValue.indexOf(@nonAttrQuote) is -1
+              result.push attr.nodeName + "=" + @nonAttrQuote + attrValue + @nonAttrQuote
+            else
+              attrValue = attrValue.replace(new RegExp(@attrQuote, 'g'), @attrQuoteEscaped)
+              result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
       if result.length > 0
         "(#{result.join(@attrSep)})"
       else
