@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "commander": "*",
-    "ent": "*",
+    "he": "^0.4.1",
     "jsdom-little": "^0.10.5"
   },
   "devDependencies": {
