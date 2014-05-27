@@ -1,6 +1,6 @@
 FS = require("fs")
 Path = require("path")
-Ent = require("ent")
+Ent = require("he")
 
 scope = exports ? this.Html2Jade ?= {}
 
@@ -8,7 +8,7 @@ nspaces = 2 # default
 useTabs = false
 doNotEncode = false
 
-entOptions = numeric: false
+entOptions = useNamedReferences: true
 
 class Parser
   constructor: (@options = {}) ->
@@ -392,7 +392,7 @@ scope.Converter = Converter
 scope.Writer = Writer
 
 applyOptions = (options) ->
-  entOptions.numeric = true if options.numeric
+  entOptions.useNamedReferences = !options.numeric
   nspaces = options.nspaces if options.nspaces
   useTabs = true if options.tabs
   doNotEncode = true if options.donotencode
