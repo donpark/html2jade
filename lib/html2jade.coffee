@@ -1,6 +1,6 @@
 FS = require("fs")
 Path = require("path")
-Ent = require("ent")
+HE = require("he")
 
 scope = exports ? this.Html2Jade ?= {}
 
@@ -113,7 +113,7 @@ class Writer
       line = if line then line.trim() else ''
     if line and line.length > 0
       # escape backslash
-      line = Ent.encode(line, entOptions) if encodeEntityRef
+      line = HE.encode(line, entOptions) if encodeEntityRef
       line = line.replace("\\", "\\\\") if escapeBackslash
       if not wrap or line.length <= @wrapLength
         output.writeln prefix + line
@@ -238,7 +238,7 @@ class Converter
         # do not encode tagText - for template variables like {{username}} inside of tags
         output.writeln tagHead + tagAttr + ' ' + tagText
       else
-        output.writeln tagHead + tagAttr + ' ' + Ent.encode(tagText, entOptions)
+        output.writeln tagHead + tagAttr + ' ' + HE.encode(tagText, entOptions)
     else
       output.writeln tagHead + tagAttr
       @children node, output
