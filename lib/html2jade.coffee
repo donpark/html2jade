@@ -314,7 +314,7 @@ class Converter
         trim: false
         wrap: false
     else
-      output.writeln "#{tagHead}#{tagAttr}"
+      output.writeln "#{tagHead}#{tagAttr}."
       @writer.writeTextContent node, output,
         pipe: false
         wrap: false
@@ -328,7 +328,7 @@ class Converter
         trim: false
         wrap: false
     else
-      output.writeln "#{tagHead}#{tagAttr}"
+      output.writeln "#{tagHead}#{tagAttr}."
       @writer.writeTextContent node, output,
         pipe: false
         wrap: false
