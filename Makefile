@@ -1,5 +1,5 @@
 build: lib/html2jade.coffee
-	coffee -c lib
+	./node_modules/.bin/coffee -c lib
 
 test: build
 	./cli.js test/data/*.html && git status -- test/data
