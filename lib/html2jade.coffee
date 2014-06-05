@@ -100,18 +100,20 @@ class Writer
       if data.length > 0
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          @writeTextLine line, output, options
+          @writeTextLine node, line, output, options
 
-  writeTextLine: (line, output, options = {}) ->
+  writeTextLine: (node, line, output, options = {}) ->
     pipe = options.pipe ? true
-    trim = options.trim ? true
+    trim = options.trim ? false
     wrap = options.wrap ? true
     encodeEntityRef = options.encodeEntityRef ? false
     escapeBackslash = options.escapeBackslash ? false
     prefix = if pipe then '| ' else ''
-    if trim
-      line = if line then line.trim() else ''
-    if line and line.length > 0
+    trimmed = if line then line.trim() else ''
+    if trimmed # ignore empty lines
+      line = line.trimLeft() unless node?.previousSibling?.nodeType is 1
+      line = line.trimRight() unless node?.nextSibling?.nodeType is 1
+      # line = trimmed if trim
       # escape backslash
       line = Ent.encode(line, entOptions) if encodeEntityRef
       line = line.replace("\\", "\\\\") if escapeBackslash
@@ -123,7 +125,7 @@ class Writer
           output.writeln prefix + line
         else
           lines.forEach (line) =>
-            @writeTextLine line, output, options
+            @writeTextLine node, line, output, options
 
   breakLine: (line) ->
     return [] if not line or line.length is 0
@@ -202,7 +204,6 @@ class Converter
         output.writeln tagHead + tagAttr
         @writer.writeTextContent node, output,
           pipe: false
-          trim: false
           wrap: false
       else if tagName is 'script'
         @script node, output, tagHead, tagAttr
@@ -281,9 +282,9 @@ class Converter
         output.enter()
         lines = data.split(/\r|\n/)
         lines.forEach (line) =>
-          @writer.writeTextLine line, output,
+          @writer.writeTextLine node, line, output,
             pipe: false
-            trim: false
+            trim: true
             wrap: false
         output.leave()
     else
@@ -311,12 +312,12 @@ class Converter
       output.writeln ':javascript'
       @writer.writeTextContent node, output,
         pipe: false
-        trim: false
         wrap: false
     else
       output.writeln "#{tagHead}#{tagAttr}."
       @writer.writeTextContent node, output,
         pipe: false
+        trim: true
         wrap: false
         escapeBackslash: true
 
@@ -325,12 +326,12 @@ class Converter
       output.writeln ':css'
       @writer.writeTextContent node, output,
         pipe: false
-        trim: false
         wrap: false
     else
       output.writeln "#{tagHead}#{tagAttr}."
       @writer.writeTextContent node, output,
         pipe: false
+        trim: true
         wrap: false
 
 class Output
