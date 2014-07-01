@@ -40,13 +40,13 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 ### Command-line Options ###
 
 * `-d, --double` - use double quotes for attributes
-* `-s, --scalate` - generate jade syntax compatible with Scalate
 * `-o, --outdir <dir>` - path to output generated jade file(s) to
 * `-n, --nspaces <n>` - the number of spaces to indent generated files with. Default is 2 spaces
 * `-t, --tabs` - use tabs instead of spaces
 * `--donotencode` - do not html encode characters. This is useful for template files which may contain expressions like {{username}}
 * `--bodyless` - do not output enveloping html and body tags
 * `--numeric` - use numeric character entities
+* `-s, --scalate` - generate [Scalate](http://scalate.fusesource.org/) variant of jade syntax
 
 ## Programmatic Usage (>= 0.0.7)
 
