@@ -254,7 +254,7 @@ class Converter
         if parent._nodeName is 'code'
           @text child, output,
             encodeEntityRef: true
-            pipe: false
+            pipe: true
         else
           @text child, output,
             if doNotEncode
