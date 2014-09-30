@@ -64,6 +64,13 @@ To convert DOM document into Jade (client-side):
     Html2Jade.convertDocument(document, {}, function (err, jade) {
       // do your thing
     });
+    
+## Converting Mustache/Handlebars Templates
+
+Jade is commonly used to generate HTML with embedded Mustache or Handlebars templates.
+
+Be sure to use version 0.8+ if you use template expressions in element IDs or CSS class names
+to avoid generating invalid Jade files.
 
 ## Status ##
 
