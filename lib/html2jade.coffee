@@ -10,6 +10,9 @@ doNotEncode = false
 
 entOptions = useNamedReferences: true
 
+validJadeIdRegExp = /^[\w\-]+$/
+validJadeClassRegExp = /^[\w\-]+$/
+
 class Parser
   constructor: (@options = {}) ->
     @jsdom = require('jsdom-little')
@@ -21,6 +24,14 @@ class Parser
       # workaround jsdom file path mishandling issue in 0.6.3+
       arg = FS.readFileSync(arg, "utf8") if @options.inputType is "file"
       @jsdom.env arg, cb
+
+isValidJadeId = (id) ->
+  id = if id then id.trim() else ""
+  id and validJadeIdRegExp.test(id)
+
+isValidJadeClassName = (className) ->
+  className = if className then className.trim() else ""
+  className and validJadeClassRegExp.test(className)
 
 class Writer
   constructor: (options = {}) ->
@@ -36,12 +47,12 @@ class Writer
     @attrQuoteEscaped = "\\#{@attrQuote}"
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
-    if node.id
+    if node.id and isValidJadeId(node.id)
       result += "##{node.id}"
     if node.hasAttribute('class') and node.getAttribute('class').length > 0
-      classes = node.getAttribute('class').split(/\s+/).filter (item) ->
-        item? and item.trim().length > 0
-      result += '.' + classes.join('.')
+      validClassNames = node.getAttribute('class').split(/\s+/).filter (item) ->
+        item and isValidJadeClassName(item)
+      result += '.' + validClassNames.join('.')
     result = 'div' if result.length is 0
     result
 
@@ -52,21 +63,32 @@ class Writer
     else
       result = []
       for attr in attrs
-        if attr and nodeName = attr.nodeName
-          if nodeName isnt 'id' and nodeName isnt 'class' and typeof attr.nodeValue?
-            attrValue = attr.nodeValue
+        if attr and attr.nodeName
+          attrName = attr.nodeName
+          attrValue = attr.nodeValue
+          if attrName is 'id' and isValidJadeId(attrValue)
+            # should already be emitted as #id, ignore
+          else if attrName is 'class'
+            invalidClassNames = node.getAttribute('class').split(/\s+/).filter (item) ->
+              item and not isValidJadeClassName(item)
+            if invalidClassNames.length > 0
+              result.push @buildTagAttr(attrName, invalidClassNames.join(' '))
+          else
             attrValue = attrValue.replace(/(\r|\n)\s*/g, "\\$1#{indents}")
-            if attrValue.indexOf(@attrQuote) is -1
-              result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
-            else if attrValue.indexOf(@nonAttrQuote) is -1
-              result.push attr.nodeName + "=" + @nonAttrQuote + attrValue + @nonAttrQuote
-            else
-              attrValue = attrValue.replace(new RegExp(@attrQuote, 'g'), @attrQuoteEscaped)
-              result.push attr.nodeName + "=" + @attrQuote + attrValue + @attrQuote
+            result.push @buildTagAttr(attrName, attrValue)
       if result.length > 0
         "(#{result.join(@attrSep)})"
       else
         ''
+
+  buildTagAttr: (attrName, attrValue) ->
+    if attrValue.indexOf(@attrQuote) is -1
+      attrName + "=" + @attrQuote + attrValue + @attrQuote
+    else if attrValue.indexOf(@nonAttrQuote) is -1
+      attrName + "=" + @nonAttrQuote + attrValue + @nonAttrQuote
+    else
+      attrValue = attrValue.replace(new RegExp(@attrQuote, 'g'), @attrQuoteEscaped)
+      attrName + "=" + @attrQuote + attrValue + @attrQuote
 
   tagText: (node) ->
     if node.firstChild?.nodeType isnt 3
