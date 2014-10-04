@@ -1,4 +1,7 @@
 attic
+lib/*.coffee
+Makefile
 node_modules
+README.md
 test
 temp
