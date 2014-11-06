@@ -131,11 +131,9 @@ class Writer
     encodeEntityRef = options.encodeEntityRef ? false
     escapeBackslash = options.escapeBackslash ? false
     prefix = if pipe then '| ' else ''
-    trimmed = if line then line.trim() else ''
-    if trimmed # ignore empty lines
-      line = line.trimLeft() unless node?.previousSibling?.nodeType is 1
-      line = line.trimRight() unless node?.nextSibling?.nodeType is 1
-      # line = trimmed if trim
+    line = line.trimLeft() unless node?.previousSibling?.nodeType is 1
+    line = line.trimRight() unless node?.nextSibling?.nodeType is 1
+    if line # ignore empty lines
       # escape backslash
       line = Ent.encode(line, entOptions) if encodeEntityRef
       line = line.replace("\\", "\\\\") if escapeBackslash
