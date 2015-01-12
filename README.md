@@ -3,6 +3,14 @@
 
 `html2jade` converts HTML into [Jade](https://github.com/visionmedia/jade) format.
 
+## Status ##
+
+Mostly usable but sometimes requires fixing up, usually involving conditionals and scripts indentation.
+
+While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
+
+**NOT** compatiable with Node.js 0.11.x. Last time I checked, incompatibility stems from `jsdom` module used by this tool.
+
 ## Requirements
 
 `html2jade` version prior to 0.7 support OS X and Linux only.
@@ -71,12 +79,6 @@ Jade is commonly used to generate HTML with embedded Mustache or Handlebars temp
 
 Be sure to use version 0.8+ if you use template expressions in element IDs or CSS class names
 to avoid generating invalid Jade files.
-
-## Status ##
-
-Mostly usable but sometimes requires fixing up, usually involving conditionals and scripts indentation.
-
-While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
 
 ## Tools using `html2jade` ##
 
