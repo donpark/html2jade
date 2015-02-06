@@ -1,8 +1,17 @@
-FS = require("fs")
-Path = require("path")
-Ent = require("he")
+isNode = false
 
+if module?
+  isNode = true
+  
 scope = exports ? this.Html2Jade ?= {}
+
+if isNode
+  FS = require "fs"
+  Path = require "path"
+  Ent = require "he"
+else
+  Ent = he;
+  window.Html2Jade = scope;
 
 nspaces = 2 # default
 useTabs = false
@@ -15,7 +24,8 @@ validJadeClassRegExp = /^[\w\-]+$/
 
 class Parser
   constructor: (@options = {}) ->
-    @jsdom = require('jsdom-little')
+    if isNode
+      @jsdom = require('jsdom-little')
 
   parse: (arg, cb) ->
     if not arg
@@ -23,7 +33,13 @@ class Parser
     else
       # workaround jsdom file path mishandling issue in 0.6.3+
       arg = FS.readFileSync(arg, "utf8") if @options.inputType is "file"
-      @jsdom.env arg, cb
+      if isNode
+        @jsdom.env arg, cb
+      else
+        window = {}
+        parser = new DOMParser()
+        window.document = parser.parseFromString arg, "text/html"
+        cb null, window
 
 isValidJadeId = (id) ->
   id = if id then id.trim() else ""
