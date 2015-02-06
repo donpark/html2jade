@@ -87,6 +87,8 @@ to avoid generating invalid Jade files.
 There is a [web version](http://html2jade.aaron-powell.com/) of `html2jade`,
 kindly provided by [@aaronpowell](https://github.com/aaronpowell).
 
+Pascal Garber's [jade2html2jade](https://github.com/JumpLink/jade2html2jade) does roundtrip from jade to HTML and back. [Online demo](http://jumplink.github.io/jade2html2jade/).
+
 ### Linux tray app ###
 
 [Miniclip](http://myguidingstar.github.com/miniclip/) is a Linux tray app that quickly converts
