@@ -56,6 +56,7 @@ program
   .option('--donotencode', 'do not html encode characters (useful for templates)')
   .option('--bodyless', 'do not output enveloping html and body tags')
   .option('--numeric', 'use numeric character entities')
+  .option('--noattrcomma', 'omit attribute separating commas')
 
 program.parse(process.argv);
 
