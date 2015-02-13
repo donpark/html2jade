@@ -9,7 +9,7 @@ Mostly usable but sometimes requires fixing up, usually involving conditionals a
 
 While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
 
-**NOT** compatiable with Node.js 0.11.x. Last time I checked, incompatibility stems from `jsdom` module used by this tool.
+**NOT** compatiable with Node.js 0.11.x, 0.12.x, and io.js. Last time I checked, incompatibility stems from `jsdom` module used by this tool.
 
 ## Requirements
 
