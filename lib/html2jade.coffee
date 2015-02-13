@@ -2,7 +2,7 @@ isNode = false
 
 if module?
   isNode = true
-  
+
 scope = exports ? this.Html2Jade ?= {}
 
 if isNode
@@ -53,7 +53,7 @@ class Writer
   constructor: (options = {}) ->
     @wrapLength = options.wrapLength ? 80
     @scalate = options.scalate ? false
-    @attrSep =if @scalate then ' ' else ', '
+    @attrSep = ' '
     if options.double
       @attrQuote = '"'
       @nonAttrQuote = "'"
