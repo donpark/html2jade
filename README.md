@@ -55,6 +55,7 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `--bodyless` - do not output enveloping html and body tags
 * `--numeric` - use numeric character entities
 * `-s, --scalate` - generate [Scalate](http://scalate.fusesource.org/) variant of jade syntax
+* `--noattrcomma` - omit attribute separating commas
 
 ## Programmatic Usage (>= 0.0.7)
 
