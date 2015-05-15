@@ -11,6 +11,15 @@ While converting a fairly complicated theme package with ~20 HTML files, I had t
 
 **NOT** compatible with Node.js 0.11.x, 0.12.x, and io.js. Last time I checked, incompatibility stems from `jsdom` module used by this tool.
 
+**WANTED: I am looking for someone to take over maintenance of this tool.**
+
+While maintenance duty is very light, I think relative popularity of this tool deserves a developer who can
+invest enough effort to take it to the next level: fully automated conversion. Besides, the code could use
+a little brushing up as it was my first CoffeeScript project and architecture is rather half-hatched and
+half-patched.
+
+If you are interested, please ping me via email in my Github profile.
+
 ## Requirements
 
 `html2jade` version prior to 0.7 support OS X and Linux only.
