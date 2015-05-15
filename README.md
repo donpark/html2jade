@@ -56,6 +56,7 @@ To generate [Scalate](http://scalate.fusesource.org/) compatible output:
 * `--numeric` - use numeric character entities
 * `-s, --scalate` - generate [Scalate](http://scalate.fusesource.org/) variant of jade syntax
 * `--noattrcomma` - omit attribute separating commas
+* `--noemptypipe` - omit lines with only pipe ('|') printable character
 
 ## Programmatic Usage (>= 0.0.7)
 

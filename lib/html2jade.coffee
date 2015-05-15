@@ -61,6 +61,7 @@ class Writer
       @attrQuote = "'"
       @nonAttrQuote = '"'
     @attrQuoteEscaped = "\\#{@attrQuote}"
+    @noEmptyPipe = options.noemptypipe ? false
   tagHead: (node) ->
     result = if node.tagName isnt 'DIV' then node.tagName.toLowerCase() else ''
     if node.id and isValidJadeId(node.id)
@@ -146,6 +147,7 @@ class Writer
     wrap = options.wrap ? true
     encodeEntityRef = options.encodeEntityRef ? false
     escapeBackslash = options.escapeBackslash ? false
+    return if pipe and @noEmptyPipe and line.trim().length is 0
     prefix = if pipe then '| ' else ''
     line = line.trimLeft() unless node?.previousSibling?.nodeType is 1
     line = line.trimRight() unless node?.nextSibling?.nodeType is 1
