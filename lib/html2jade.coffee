@@ -25,7 +25,7 @@ validJadeClassRegExp = /^[\w\-]+$/
 class Parser
   constructor: (@options = {}) ->
     if isNode
-      @jsdom = require('jsdom-little')
+      @jsdom = require('jsdom')
 
   parse: (arg, cb) ->
     if not arg
