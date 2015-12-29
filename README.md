@@ -9,7 +9,7 @@ Mostly usable but sometimes requires fixing up, usually involving conditionals a
 
 While converting a fairly complicated theme package with ~20 HTML files, I had to hand-edit just twice.
 
-**NOT** compatible with Node.js 0.11.x, 0.12.x, and io.js. Last time I checked, incompatibility stems from `jsdom` module used by this tool.
+Compatible with Node.js 4.0+ (verified with v4.2.4) but likely **NOT** with Node.js 0.11.x, 0.12.x, and io.js.
 
 **WANTED: I am looking for someone to take over maintenance of this tool.**
 
