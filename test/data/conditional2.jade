@@ -1,3 +1,7 @@
+mixin bbr()
+  | 
+  | <br />
+
 doctype html
 // paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/
 //if lt IE 7
@@ -119,17 +123,17 @@ html.no-js(lang='en')
         ul.disc
           li
             a(href='http://foundation.zurb.com/docs') Foundation Documentation
-            br
+            +bbr()
             | Everything you need to know about using the framework.
           |         
           li
             a(href='http://github.com/zurb/foundation') Foundation on Github
-            br
+            +bbr()
             | Latest code, issue reports, feature requests and more.
           |         
           li
             a(href='http://twitter.com/foundationzurb') @foundationzurb
-            br
+            +bbr()
             | Ping us on Twitter if you have questions. If you build something with this we&apos;d love to see it (and send you a totally boss sticker).
     // Included JS Files
     script(src='vendor/assets/javascripts/foundation/jquery.js')
