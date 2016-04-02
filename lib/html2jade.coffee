@@ -222,7 +222,6 @@ class Converter
         docTypeName = 'html'
       if docTypeName?
         output.writeln 'mixin bbr()'
-        output.writeln '  | '
         output.writeln '  | <br />'
         output.writeln ''
         output.writeln 'doctype ' + docTypeName
