@@ -207,6 +207,8 @@ class Converter
     @writer = @options.writer ? new Writer(@options)
 
   document: (document, output) ->
+
+
     if document.doctype?
       doctype = document.doctype
       docTypeName = undefined
@@ -219,6 +221,9 @@ class Converter
       else if doctype.name? and doctype.name.toLowerCase() is 'html'
         docTypeName = 'html'
       if docTypeName?
+        output.writeln 'mixin bbr()'
+        output.writeln '  | '
+        output.writeln '  | <br />'
         output.writeln 'doctype ' + docTypeName
 
     if document.documentElement
@@ -250,6 +255,8 @@ class Converter
     else if tagName is 'conditional'
       output.writeln '//' + node.getAttribute('condition')
       @children node, output
+    else if tagName is 'br'
+      output.writeln '+bbr()'
     else if ['pre'].indexOf(tagName) isnt -1
       # HACK: workaround jade's wonky PRE handling
       output.writeln tagHead + tagAttr + '.'
