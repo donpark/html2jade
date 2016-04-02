@@ -4,3 +4,4 @@ node_modules
 temp
 .idea/
 *.iml
+*.js.map

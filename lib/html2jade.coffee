@@ -224,6 +224,7 @@ class Converter
         output.writeln 'mixin bbr()'
         output.writeln '  | '
         output.writeln '  | <br />'
+        output.writeln ''
         output.writeln 'doctype ' + docTypeName
 
     if document.documentElement
