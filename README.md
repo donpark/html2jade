@@ -110,3 +110,10 @@ HTML to Jade, CSS to Stylus and JS to Coffee from clipboard.
 As of version 0.4, there is a simple unit test that converts HTML files in `test/data` directory
 and compare them against Jade files in the same directory. Unit test harness requires `coffee-script`
 and `mocha` to be installed globally. Run the tests with command `npm test`.
+
+
+## Useful forks ##
+
+If you're having issues with `br` line-breaks which apparently Jade has some problems with,
+try [@smaudet](https://github.com/smaudet)'s
+[`fix-breaklines`](https://github.com/smaudet/html2jade/tree/fix-breaklines) branch.
