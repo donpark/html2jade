@@ -1,2 +1,2 @@
-*.jade -crlf
-*.html -crlf
+*.jade text eol=lf
+*.html text eol=lf
