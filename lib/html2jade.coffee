@@ -431,10 +431,10 @@ scope.Converter = Converter
 scope.Writer = Writer
 
 applyOptions = (options) ->
-  entOptions.useNamedReferences = !options.numeric
-  nspaces = options.nspaces if options.nspaces
-  useTabs = true if options.tabs
-  doNotEncode = true if options.donotencode
+  entOptions.useNamedReferences = !options.numeric if options.numeric?
+  nspaces = parseInt(options.nspaces) if options.nspaces?
+  useTabs = !!options.tabs if options.tabs?
+  doNotEncode = !!options.donotencode if options.donotencode?
 
 # node.js classes
 if exports?
