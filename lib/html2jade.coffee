@@ -433,7 +433,7 @@ scope.Writer = Writer
 applyOptions = (options) ->
   entOptions.useNamedReferences = !options.numeric
   nspaces = options.nspaces if options.nspaces
-  useTabs = true if options.tabs
+  useTabs = !!options.tabs
   doNotEncode = true if options.donotencode
 
 # node.js classes
