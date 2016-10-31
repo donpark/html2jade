@@ -3,6 +3,9 @@
 
 `html2jade` converts HTML into [Jade](https://github.com/visionmedia/jade) format.
 
+This module is now maintained by [@aichholzer](https://github.com/aichholzer)
+
+
 ## Status ##
 
 Mostly usable but sometimes requires fixing up, usually involving conditionals and scripts indentation.
@@ -11,14 +14,6 @@ While converting a fairly complicated theme package with ~20 HTML files, I had t
 
 Compatible with Node.js 4.0+ (verified with v4.2.4) but likely **NOT** with Node.js 0.11.x, 0.12.x, and io.js.
 
-**WANTED: I am looking for someone to take over maintenance of this tool.**
-
-While maintenance duty is very light, I think relative popularity of this tool deserves a developer who can
-invest enough effort to take it to the next level: fully automated conversion. Besides, the code could use
-a little brushing up as it was my first CoffeeScript project and architecture is rather half-hatched and
-half-patched.
-
-If you are interested, please ping me via email in my Github profile.
 
 ## Requirements
 
