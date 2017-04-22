@@ -2,3 +2,6 @@ attic
 node_modules
 .c9/
 temp
+.idea/
+*.iml
+*.js.map
