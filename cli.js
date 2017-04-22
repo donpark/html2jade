@@ -3,6 +3,8 @@
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
+var http = require('http');
+var https = require('https');
 
 var existsSync = fs.existsSync || path.existsSync;
 
@@ -98,7 +100,16 @@ for (var i = 0; i < args.length; i++) {
   if (inputUrl && inputUrl.protocol) {
     // URL input, use stdout
     program.inputType = "url";
-    convert(arg, undefined, program);
+	var handler = (inputUrl.protocol == 'https:')?https:http;
+    var req = handler.get(arg, function (res) {
+      var data = '';
+      res.on('data', function (chunk) {
+          data += chunk;
+      });
+      res.on('end', function () {
+        convert(data, undefined, program);
+      });
+    });
   } else {
     // path or glob
     inputPath = parsePath(arg);
