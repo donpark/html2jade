@@ -1,29 +1,52 @@
 {
   "name": "html2jade",
   "description": "HTML to Jade conversion tool",
-  "version": "0.8.6",
-  "author": "Don Park <donpark@docuverse.com>",
-  "repository": "git://github.com/donpark/html2jade.git",
+  "version": "1.0.0",
+  "author": {
+    "name": "Don Park",
+    "email": "donpark@docuverse.com",
+    "url": "https://github.com/donpark"
+  },
+  "maintainers": [
+    {
+      "name": "Stefan Aichholzer",
+      "email": "play@analogbird.com",
+      "url": "https://github.com/aichholzer"
+    }
+  ],
   "license": "BSD",
-  "main": "./lib/html2jade.js",
+  "engines": {
+    "node": ">=7.6"
+  },
+  "main": "./lib/index.js",
   "bin": {
-    "html2jade": "./cli.js"
+    "html2jade": "./lib/cli.js"
   },
-  "scripts": {
-    "prepublish": "coffee -c lib",
-    "test": "mocha"
+  "directories": {
+    "test": "test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:donpark/html2jade.git"
+  },
+  "bugs": {
+    "url": "https://github.com/donpark/html2jade/issues"
+  },
+  "homepage": "https://github.com/donpark/html2jade",
   "dependencies": {
-    "commander": "*",
-    "he": "^0.4.1",
-    "jsdom-little": "^0.10.5"
+    "commander": "^2.9.0",
+    "he": "^1.1.1",
+    "jsdom-little": "^0.10.6"
   },
   "devDependencies": {
-    "async": "*",
-    "mocha": "*",
-    "coffee-script": "~1.6.3"
+    "async": "^2.3.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-jscs": "^3.0.1",
+    "jscs": "^3.0.7",
+    "mocha": "^3.2.0"
   },
-  "engines": {
-    "node": ">= 0.4.0"
+  "scripts": {
+    "test": "mocha"
   }
 }
