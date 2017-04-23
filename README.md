@@ -3,8 +3,6 @@
 
 `html2jade` converts HTML into [Jade](https://github.com/visionmedia/jade) format.
 
-This module is now maintained by [@aichholzer](https://github.com/aichholzer)
-
 
 ## Status ##
 
