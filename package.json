@@ -36,7 +36,8 @@
   "dependencies": {
     "commander": "^2.9.0",
     "he": "^1.1.1",
-    "jsdom-little": "^0.10.6"
+    "jsdom-little": "^0.10.6",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "async": "^2.3.0",
