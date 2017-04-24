@@ -310,7 +310,7 @@ class Converter
     @writer.writeText node, output, options
 
   comment: (node, output) ->
-    condition = node.data.match /\s*\[(if\s+[^\]]+)\]/
+    condition = node.data.match /\s*\[(if\s+[^\]]+)\]|<!\[endif\]/
     if not condition
       data = node.data or ''
       if data.length is 0 or data.search(/\r|\n/) is -1
@@ -329,21 +329,13 @@ class Converter
       @conditional node, condition[1], output
 
   conditional: (node, condition, output) ->
-    # HACK: previous versions formally parsed content of conditional comments
-    # which didn't work client-side and was also implicitly dependent on
-    # parser operation being synchronous.
-    #
-    # Replacement hack converts conditional comments into element type 'conditional'
-    # and relies on HTML DOM's innerHTML to parse textual content into DOM.
-    innerHTML = node.textContent.trim().replace(/\s*\[if\s+[^\]]+\]>\s*/, '').replace('<![endif]', '')
-    # special-case handling of common conditional HTML element rick
-    if innerHTML.indexOf("<!") is 0
-      condition = " [#{condition}] <!"
-      innerHTML = null
-    conditionalElem = node.ownerDocument.createElement('conditional')
-    conditionalElem.setAttribute('condition', condition)
-    conditionalElem.innerHTML = innerHTML if innerHTML
-    node.parentNode.insertBefore conditionalElem, node.nextSibling
+    # Jade does not have any special syntax for conditional comments. 
+    # And If your line begins with < then it is treated as plain text.
+    # So just use normal HTML style conditional comments.
+    data = node.data or ''
+    if data.trim().indexOf('<![endif]') is 0
+      output.writeln '| '
+    output.writeln "<!--#{data.trim()}-->"
 
   script: (node, output, tagHead, tagAttr) ->
     if @scalate
